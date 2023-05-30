@@ -1,0 +1,145 @@
+body {
+  overflow-x: hidden;
+  width: 250px;
+  color: var(--color-primary);
+  font-size: var(--font-size-primary);
+}
+
+/* Rounded border */
+hr.rounded {
+  border-top: 4px solid #bbb;
+  border-radius: 5px;
+  width: 100%;
+}
+
+p,
+span {
+  display:block
+}
+
+
+
+.image,
+header img {
+  height: 1em;
+  max-width: 80%;
+}
+
+#page-info {
+  border-top: var(--border-width-thin) var(--border-style-primary) var(--border-color-primary);
+}
+
+
+.stats-total {
+  flex-grow: 1;
+  font-size:  0.8em;
+  text-align: center;
+  font-family: verdana, 'open sans', sans-serif;
+  color: var(--color-dimmed);
+  font-weight: bold; 
+  position: center;
+  align-items: center;
+  display:block
+}
+
+.watchDataDiv {
+  background: #fff;
+   width: 100%;;
+  border: 3px solid green;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 8px;
+  align-items: center;
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+  
+}
+
+
+.watchdata_details {
+  flex-grow: 1;
+  font-size:  0.8em;
+  text-align: left;
+  font-family: verdana, 'open sans', sans-serif;
+  color: var(--color-dimmed);
+  display: none;
+  border-radius: 6px;
+  align-items: center;
+}
+
+.showDataBtn,
+.clearBtn {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+
+.w3-light-grey,.w3-hover-light-grey:hover,.w3-light-gray,.w3-hover-light-gray:hover{
+  color:#000!important;
+  border-radius: 25px;
+  border: 1px solid black;
+  align-items: center;
+  background-color:#f1f1f1!important
+}
+
+.w3-green,.w3-hover-green:hover{
+  color:#fff!important;
+  background-color:#4CAF50!important}
+
+
+  #counter-panel {
+    margin-top: 5px;
+    padding-bottom: 0;
+    text-align: center;
+    font-size: 20px;
+    align-items: center;
+    font-family: verdana, 'open sans', sans-serif;
+}
+
+  /* CSS */
+  .button-3 {
+    
+    background-color: #2ea44f;
+    border: 1px solid rgba(27, 31, 35, .15);
+    border-radius: 6px;
+    box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: verdana, 'open sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    padding: 6px 16px;
+    position: center;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .button-3:focus:not(:focus-visible):not(.focus-visible) {
+    box-shadow: none;
+    outline: none;
+  }
+  
+  .button-3:hover {
+    background-color: #2c974b;
+  }
+  
+  .button-3:focus {
+    box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+    outline: none;
+  }
+  
+  .button-3:disabled {
+    background-color: #94d3a2;
+    border-color: rgba(27, 31, 35, .1);
+    color: rgba(255, 255, 255, .8);
+    cursor: default;
+  }
+  
+  .button-3:active {
+    background-color: #298e46;
+    box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+  }

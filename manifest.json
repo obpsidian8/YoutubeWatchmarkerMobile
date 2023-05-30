@@ -1,0 +1,29 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "browser_action": {
+      "browser_style": false,
+      "default_icon": {
+         "128": "content/icon.png"
+      },
+      "default_title": "Watchmarker Mobile",
+      "default_popup": "/content/index.html"
+   },
+   "content_scripts": [ {
+      "css": [ "youtube.css" ],
+      "js": [ "youtube.js" ],
+      "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ]
+   } ],
+   "description": "Automatically mark videos on Youtube that you have already watched.",
+   "homepage_url": "https://sniklaus.com/",
+   "icons": {
+      "128": "content/icon.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhqDUx6IgDWm+gRXc2fJEwZiNbKkf1lxOYlXJeF/e59sNJOSNIBHSccHz7mRx+6RfXBIMePbQCNoctIuxKREptQINTk87rO1ZDDO2LtihSTNObMV71eGP7qNJmZzrMhZAauwp08LmuovumldVflN8ckBtfoq/ATUbf4dP6D6ZITFV4WGMs4qAD7nF1LtS+QOludUbdyfx/NKVzWVwh+KMN0e0p8vCQp+QkTyB/aWNPzpuBWKQqaCHgH67CKP4CAmT7DzqeJ7G/595G6AgZHvtFDHN6+LroU1iV+Xsf6Z9Kpnjf5fcT3M4coSRiHVamn3o18U9k34ur5kdT/MGRSwEAQIDAQAB",
+   "manifest_version": 2,
+   "name": "Watchmarker Mobile",
+   "permissions": [ "alarms","storage", "downloads", "history", "tabs", "cookies", "webRequest", "webRequestBlocking", "*://www.youtube.com/*", "*://*.ytimg.com/vi/*/*", "*://m.youtube.com/*"],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.3.1"
+}
