@@ -86,7 +86,14 @@ function createOverlay (objVideo, percentPlayed)
         for (var objVideo of document.querySelectorAll('a.ytd-thumbnail[href^="/watch?v=' + vidId + '"], a.compact-media-item-image[href^="/watch?v=' + vidId + '"], a.media-item-thumbnail-container[href^="/watch?v=' + vidId + '"], a.ytd-thumbnail[href^="/shorts/' + vidId + '"]')) 
         {
             console.log(` About to overlay video: ${objVideo}`);
-            objVideo.lastChild.lastChild.appendChild(playbackOverlayElement)
+            var targetElement = objVideo.lastChild.lastChild
+            if (targetElement === null)
+                {
+                    targetElement = objVideo.lastElementChild
+                }
+
+                targetElement.appendChild(playbackOverlayElement);
+            
         }
 
     };
