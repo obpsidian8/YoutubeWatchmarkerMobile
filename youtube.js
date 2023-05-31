@@ -10,6 +10,8 @@ var vidsWatched  = {}
 var checkPageCount = 0;
 
 console.log(`Loading watchData via content script`)
+
+// Data will be refreshed each time the page is loaded
 var vidsWatched = window.localStorage.getItem("watchData");
 if (!vidsWatched)
     {
@@ -93,7 +95,6 @@ function createOverlay (objVideo, percentPlayed)
                 }
 
                 targetElement.appendChild(playbackOverlayElement);
-            
         }
 
     };
@@ -105,13 +106,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         console.log('Message received from background. Processing.');
         if (objData.type === "NEW")
             {
-                console.log(`Received vidswatched message from background. Details:`);
-                // vidsWatched = objData.vidsWatched
-                // vidsWatched = JSON.parse(vidsWatched)
-                // console.log(`vidsWatched from listener${vidsWatched}`);
-                // console.log(vidsWatched);
-                // currentVideo = objData.videoId;
-                console.log(objData)
+                console.log(`Received message from background that page has changed.`);
                 refresh();
             }
         else if (objData.type === "clearWatchData")
@@ -180,13 +175,18 @@ function checkPage()
                                 (message, 
                                             function (response) 
                                             {
-                                                // console.log(JSON.parse(response.vidsWatched));
+                                                // console.log();
                                             }
 
                                 );
                                             
                                 // Save data to localStorage from frontend
                                 var vidId = message.vidUrl.split('v=')[1].split("#")[0];
+                                if (vidId.includes("&"))
+                                    {
+                                        vidId = vidId.split("&")[0]
+                                    }
+
                                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                                 var details = { 
                                             "vidId": vidId,
