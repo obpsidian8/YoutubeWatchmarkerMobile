@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 console.log(_x.substr(0, 50) + " = " + (_xLen / 1024).toFixed(2) + " KB")
                 if (_x.substr(0, 50).includes("watchData"))
                     {
-                        watchData = _x.substr(0, 50) + ": " + (_xLen / 1024).toFixed(2) + "KB"
+                        watchData = _x.substr(0, 50) + " Usage: " + (_xLen / 1024).toFixed(2) + "KB"
                         
                     }
         };
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
         const TotalUsedEle = document.createElement("p");
         const watchDataEle = document.createElement("p");
 
-        TotalUsedEle.textContent = "Total Usage (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
+        TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
         watchDataEle.textContent = watchData
         document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
         document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
@@ -45,8 +45,9 @@ document.addEventListener("DOMContentLoaded" ,function ()
 
         document.getElementById("clearWatchDataBtn").addEventListener("click", function () {
                 console.log(`Sending signal to content script to clear watchData.`)
-                window.localStorage.removeItem("watchData");
+                window.localStorage.removeItem("watchData"); // Clears the data on the backend
                 window.localStorage.setItem("watchData", JSON.stringify({}));
+                
                 const clearMsg = document.createElement("p");
                 clearMsg.style = "text-align: center;"
                 clearMsg.id = "dataClearMsg"
@@ -100,7 +101,6 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 container.appendChild(infoEleTitle);
                                 container.appendChild(infoElePercentPlayed);
                                 container.appendChild(infoEleVidId);
-                                
                             }
                     }
 
@@ -111,14 +111,38 @@ document.addEventListener("DOMContentLoaded" ,function ()
                         document.location.reload();
                         return
                     }
-            
-            
-
             }
         );
 
+        document.getElementById("syncWatchDataBtn").addEventListener("click", function()
+            {
+                // Sets/syncs the backend watchData witn the response from front end
+                // Send message to content script to fetch data
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, 
+                        {
+                            message: "autoFill",
+                            type: "syncData" 
+                        }, function(response) {
+                            console.log(response) // Data received from front end as JSON
+                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
 
-        
+                            const syncMsg = document.createElement("p");
+                            syncMsg.style = "text-align: center;"
+                            syncMsg.id = "syncClearMsg"
+                            syncMsg.textContent = "Watch Data Synced!"
+                            document.querySelectorAll(".syncDataBtn")[0].appendChild(syncMsg);
+            
+                            setTimeout(function () {
+                                document.getElementById('syncClearMsg').style.display = 'none'
+                                document.location.reload()
+                            }, 3000)
+                        })
+                })
+
+                // END SEND MESSAGE
+            }
+        );
         
     }
 );

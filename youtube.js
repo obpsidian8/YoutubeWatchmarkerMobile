@@ -12,7 +12,7 @@ var checkPageCount = 0;
 console.log(`Loading watchData via content script`)
 
 // Data will be refreshed each time the page is loaded
-var vidsWatched = window.localStorage.getItem("watchData");
+var vidsWatched = window.localStorage.getItem("watchData"); //STRING
 if (!vidsWatched)
     {
         var vidsWatched = {}; //JSON
@@ -108,15 +108,23 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             {
                 console.log(`Received message from background that page has changed.`);
                 refresh();
+                funcResponse(null);
             }
         else if (objData.type === "clearWatchData")
             {
                 console.log(`Received clearWatchData  message from content. Details:`);
                 window.localStorage.removeItem("watchData");
                 window.localStorage.setItem("watchData", JSON.stringify({}));
+                funcResponse(null);
             }
+        else if (objData.type === "syncData")
+        {
+            console.log(`Received syncDataBtn  message from content. Sending back watchdata:`);
+            funcResponse({"data": vidsWatched});
+        }
         console.log("Done messageReceivedProcess")
-        funcResponse(null);
+        
+        return true
     };
 
 // ##########################################################
@@ -125,7 +133,12 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 window.setInterval(checkPage, 300);
 function checkPage()
     {
-        console.log(`Checking page for new elements ${checkPageCount}`)
+        if (checkPageCount % 20 === 0)
+            {
+                console.log(`Checking page for new elements ${checkPageCount}`)
+            }
+        
+        
         // if (document.hidden === true) {
         //     return;
         // }
@@ -161,6 +174,12 @@ function checkPage()
                         else if (fractionWatched > 0.2)
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
+                                var vidId = document.URL.split('v=')[1].split("#")[0];
+                                if (vidId.includes("&"))
+                                    {
+                                        vidId = vidId.split("&")[0]
+                                    }
+
                                 // Send message to backend with time of video
                                 console.log(`Sending current vid details to background`)
                                 message = { "timeInfo": {  "currentTime":currentTime, 
@@ -168,7 +187,8 @@ function checkPage()
                                                         },
                                             "vidUrl": document.URL,
                                             "title": document.title,
-                                            "msgType": "vidPlayingInfo"
+                                            "msgType": "vidPlayingInfo",
+                                            "vidId": vidId
                                         }
 
                                 chrome.runtime.sendMessage
@@ -181,11 +201,7 @@ function checkPage()
                                 );
                                             
                                 // Save data to localStorage from frontend
-                                var vidId = message.vidUrl.split('v=')[1].split("#")[0];
-                                if (vidId.includes("&"))
-                                    {
-                                        vidId = vidId.split("&")[0]
-                                    }
+
 
                                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                                 var details = { 
@@ -198,13 +214,13 @@ function checkPage()
                                                         }
                                             };
                             
-                                var currentWatchDataObj = window.localStorage.getItem("watchData");
-                                currentWatchDataObj = JSON.parse(currentWatchDataObj) //JSON
+                                var currentWatchDataObj = window.localStorage.getItem("watchData"); // result is a STRING
+                                currentWatchDataObj = JSON.parse(currentWatchDataObj) //turn to JSON to modify
                                 console.log(details);
                                 currentWatchDataObj[vidId] = details
                                 console.log(`currentWatchDataObj:-`);
                                 console.log(currentWatchDataObj);
-                                window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj));
+                                window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj)); // turn to STRING to set
                         }
                     }
             }

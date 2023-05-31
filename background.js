@@ -15,6 +15,7 @@ console.log(vidsWatched)
 chrome.tabs.onUpdated.addListener(tabsUpdatedProcess);
 function tabsUpdatedProcess (tabId,changeInfo, tab)
     {
+        console.log(`........................................................`)
         console.log(`UPDATE EVENT FIRED! URL: ${tab.url}, Tab id: ${tab.id}`)
         if (tab.url && tab.url.includes("youtube.com"))
             {
@@ -56,6 +57,7 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
 chrome.runtime.onMessage.addListener(processMsgFromFrontend);
 function processMsgFromFrontend (message, sender, sendResponse)
     {
+        console.log(`+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++`)
         console.log(`MESSAGE RECEIVED FROM CONTENT SCRIPT!`)
         if (message.msgType==="vidPlayingInfo")
             {
@@ -73,12 +75,9 @@ function processMsgFromFrontend (message, sender, sendResponse)
                     }
         
                 console.log(`Storing vid details on backend`)
-                var vidId = message.vidUrl.split('v=')[1].split("#")[0];
-                // console.log(vidId);
-        
                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                 var details = { 
-                            "vidId": vidId,
+                            "vidId": message.vidId,
                             "vidUrl": message.vidUrl,
                             "title": message.title,
                             "timeInfo": {  "currentTime":message.timeInfo.currentTime, 
@@ -90,7 +89,7 @@ function processMsgFromFrontend (message, sender, sendResponse)
                 var currentWatchDataObj = window.localStorage.getItem("watchData");
                 currentWatchDataObj = JSON.parse(currentWatchDataObj) //JSON
                 console.log(details);
-                currentWatchDataObj[vidId] = details
+                currentWatchDataObj[message.vidId] = details
                 console.log(`currentWatchDataObj:-`);
                 console.log(currentWatchDataObj);
                 window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj));
