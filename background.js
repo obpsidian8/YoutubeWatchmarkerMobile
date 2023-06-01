@@ -30,6 +30,10 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
                 });
 
                 chrome.tabs.insertCSS(tab.id, {
+                    'code': '.thumbnail-overlay-resume-playback-progress {background-color: #f00; height: 4px; left: 0;}'
+                });
+
+                chrome.tabs.insertCSS(tab.id, {
                     'code': '.youwatch-mark yt-img-shadow img { filter:grayscale(1.0); }' + '.youwatch-mark yt-image img { filter:grayscale(1.0); }'
                 });
 

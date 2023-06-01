@@ -62,11 +62,18 @@ function mark (objVideo,percentPlayed, boolMark)
         {
             objVideo.classList.add('youwatch-mark');
             objVideo.style = "opacity:0.35";
-            element = objVideo.querySelector('.yt-core-attributed-string');
-            objVideo.querySelector('.yt-core-attributed-string').textContent
-            element.textContent = "seen| " + element.textContent
+
+            try {
+                element = objVideo.querySelector('.yt-core-attributed-string');
+                objVideo.querySelector('.yt-core-attributed-string').textContent
+                element.textContent = "seen| " + element.textContent
+              } 
+            catch (err) 
+                {
+                console.log(`Error: ${err}`)
+                }
+
             createOverlay(objVideo,percentPlayed);
-            // objVideo.lastChild.lastChild.lastChild.lastChild.lastChild.lastChild.textContent = objVideo.lastChild.lastChild.lastChild.lastChild.lastChild.lastChild.textContent + " WATCHED"
         } 
         
         else if ((boolMark !== true) && (objVideo.classList.contains('youwatch-mark') !== false)) 
@@ -83,19 +90,24 @@ function createOverlay (objVideo, percentPlayed)
         playbackOverlayElement.className = "thumbnail-overlay-resume-playback-progress"
         playbackOverlayElement.style= "width: "+(percentPlayed *100)+"%"
 
-        vidId = vidObj.href.split('&')[0].slice(-11);
-
-        for (var objVideo of document.querySelectorAll('a.ytd-thumbnail[href^="/watch?v=' + vidId + '"], a.compact-media-item-image[href^="/watch?v=' + vidId + '"], a.media-item-thumbnail-container[href^="/watch?v=' + vidId + '"], a.ytd-thumbnail[href^="/shorts/' + vidId + '"]')) 
-        {
-            console.log(` About to overlay video: ${objVideo}`);
-            var targetElement = objVideo.lastChild.lastChild
-            if (targetElement === null)
-                {
-                    targetElement = objVideo.lastElementChild
-                }
-
+        console.log(`About to overlay video: ${objVideo}`);
+        var targetElement = objVideo.lastChild.lastChild
+        if (targetElement === null)
+            {
+                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media').parentElement;
+                objVideoChild = targetElement .querySelectorAll('.thumbnail-overlay-resume-playback-progress')[0]
+                if (objVideoChild)
+                    {
+                        console.log(`Overlay already present`)
+                        return
+                    }
                 targetElement.appendChild(playbackOverlayElement);
-        }
+            }
+        else
+            {
+                targetElement.appendChild(playbackOverlayElement);
+            }
+            
 
     };
 
