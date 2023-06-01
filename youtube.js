@@ -61,7 +61,7 @@ function mark (objVideo,percentPlayed, boolMark)
         if ((boolMark === true) ) 
         {
             objVideo.classList.add('youwatch-mark');
-            objVideo.style = "opacity:0.35";
+            objVideo.style = "opacity:0.4";
 
             try {
                 element = objVideo.querySelector('.yt-core-attributed-string');
@@ -94,14 +94,15 @@ function createOverlay (objVideo, percentPlayed)
         var targetElement = objVideo.lastChild.lastChild
         if (targetElement === null)
             {
-                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media').parentElement;
-                objVideoChild = targetElement .querySelectorAll('.thumbnail-overlay-resume-playback-progress')[0]
+                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media');
+                objVideoChild = targetElement.querySelectorAll('.thumbnail-overlay-resume-playback-progress')[0]
                 if (objVideoChild)
                     {
                         console.log(`Overlay already present`)
                         return
                     }
                 targetElement.appendChild(playbackOverlayElement);
+                targetElement.insertBefore(targetElement.querySelectorAll('.youwatch-mark')[0], playbackOverlayElement);
             }
         else
             {
@@ -183,7 +184,7 @@ function checkPage()
                                 console.log(`Video has finished playing`)
                                 
                             }
-                        else if (fractionWatched > 0.2)
+                            else if ((vidDuration<300 && fractionWatched >0.5 )  || (vidDuration>300 && currentTime >300) )
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
                                 var vidId = document.URL.split('v=')[1].split("#")[0];

@@ -15,7 +15,7 @@
       "js": [ "youtube.js" ],
       "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ]
    } ],
-   "description": "Automatically mark videos on Youtube Mobile that you have already watched.",
+   "description": "Automatically mark videos on Youtube mobile and desktop that you have already watched.",
    "homepage_url": "https://github.com/obpsidian8/YoutubeWatchmarkerMobile",
    "icons": {
       "128": "content/icon.png"
@@ -25,5 +25,5 @@
    "name": "Watchmarker Mobile",
    "permissions": [ "alarms","storage", "downloads", "history", "tabs", "cookies", "webRequest", "webRequestBlocking", "*://www.youtube.com/*", "*://*.ytimg.com/vi/*/*", "*://m.youtube.com/*"],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.3.8"
+   "version": "1.4"
 }
