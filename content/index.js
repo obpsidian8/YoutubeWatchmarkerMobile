@@ -88,6 +88,10 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 const container = document.createElement("div");
                                 container.className = "watchDataDiv"
 
+                                const divider = document.createElement("hr")
+                                divider.className = "divider"
+                                const dividerA = divider.cloneNode(true);
+
                                 const infoEleTitle = document.createElement("span");
                                 const infoElePercentPlayed = document.createElement("span");
                                 const infoEleVidId = document.createElement("span");
@@ -99,7 +103,9 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 document.querySelectorAll('.watchdata_details')[0].appendChild(container);
 
                                 container.appendChild(infoEleTitle);
+                                container.appendChild(divider);
                                 container.appendChild(infoElePercentPlayed);
+                                container.appendChild(dividerA);
                                 container.appendChild(infoEleVidId);
                             }
                     }

@@ -14,9 +14,16 @@ hr.rounded {
 
 p,
 span {
-  display:block
+  display:block;
+  font-family: 'Trebuchet MS';
+  align-items: center;
 }
 
+
+hr.divider { 
+  margin: 0.2em;
+  border-width: 2px;
+} 
 
 
 .image,
@@ -96,7 +103,7 @@ header img {
     text-align: center;
     font-size: 20px;
     align-items: center;
-    font-family: verdana, 'open sans', sans-serif;
+    font-family: Verdana;
 }
 
   /* CSS */
