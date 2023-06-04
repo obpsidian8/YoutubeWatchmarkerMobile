@@ -184,7 +184,7 @@ function checkPage()
                                 console.log(`Video has finished playing`)
                                 
                             }
-                            else if ((vidDuration<300 && fractionWatched >0.5 )  || (vidDuration>300 && currentTime >300) )
+                            else if ((vidDuration<300 && fractionWatched >0.5 )  || (vidDuration>300 && currentTime >120) )
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
                                 var vidId = document.URL.split('v=')[1].split("#")[0];
