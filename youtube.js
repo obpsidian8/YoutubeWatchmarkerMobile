@@ -8,6 +8,7 @@ var vidDuration =  null;
 var currentVideo = null;
 var vidsWatched  = {}
 var checkPageCount = 0;
+var currentpage = null;
 
 console.log(`Loading watchData via content script`)
 
@@ -158,6 +159,21 @@ function checkPage()
 
         if (document.URL.includes("youtube.com/watch")) 
             {
+                var vidId = document.URL.split('v=')[1].split("#")[0];
+                if (vidId.includes("&"))
+                {
+                    vidId = vidId.split("&")[0]
+                }
+
+                if (vidsWatched[vidId] && currentpage != document.URL)
+                {
+                    // Start the video from last played time
+                    let watchedVidObject = vidsWatched[vidId]
+                    let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
+                    document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
+                    currentpage = document.URL
+                }
+
                 if (isNaN(parseFloat(vidDuration))) 
                     {
                         vidDuration = document.getElementsByClassName('video-stream')[0].duration;
@@ -182,17 +198,11 @@ function checkPage()
                         if (fractionWatched >= 0.98)
                             {
                                 console.log(`Video has finished playing`)
-                                
                             }
-                            else if ((vidDuration<300 && fractionWatched >0.5 )  || (vidDuration>300 && currentTime >120) )
+                        else if ((vidDuration<120 && fractionWatched >0.5 )  || (vidDuration>120 && currentTime >60) )
+                        // else
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
-                                var vidId = document.URL.split('v=')[1].split("#")[0];
-                                if (vidId.includes("&"))
-                                    {
-                                        vidId = vidId.split("&")[0]
-                                    }
-
                                 // Send message to backend with time of video
                                 console.log(`Sending current vid details to background`)
                                 message = { "timeInfo": {  "currentTime":currentTime, 
@@ -214,8 +224,6 @@ function checkPage()
                                 );
                                             
                                 // Save data to localStorage from frontend
-
-
                                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                                 var details = { 
                                             "vidId": vidId,
@@ -234,7 +242,7 @@ function checkPage()
                                 console.log(`currentWatchDataObj:-`);
                                 console.log(currentWatchDataObj);
                                 window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj)); // turn to STRING to set
-                        }
+                            }
                     }
             }
 

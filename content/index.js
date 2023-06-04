@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 const infoEleVidId = document.createElement("span");
 
                                 infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
-                                infoElePercentPlayed.textContent = " Percent played: " +((currentWatchDataObj[property].timeInfo.percentPlayed).toFixed(2))*100 +"%"
+                                infoElePercentPlayed.textContent = " Percent played: " +((currentWatchDataObj[property].timeInfo.percentPlayed).toFixed(2))*100 +"%" + " (" + currentWatchDataObj[property].timeInfo.currentTime + "secs )"
                                 infoEleVidId.textContent =  " vid id: " + currentWatchDataObj[property].vidId
                                 // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
