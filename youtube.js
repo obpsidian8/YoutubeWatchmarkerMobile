@@ -165,35 +165,38 @@ function checkPage()
                     vidId = vidId.split("&")[0]
                 }
 
-                if (vidsWatched[vidId] && currentpage != document.URL)
-                {
-                    // Start the video from last played time
-                    let watchedVidObject = vidsWatched[vidId]
-                    let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
-                    document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
-                    currentpage = document.URL
-                }
-
+                vidDuration = document.getElementsByClassName('video-stream')[0].duration;
+                console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
+                
+                // if (isNaN(parseFloat(vidDuration))) 
+                //     {
+                //         vidDuration = document.getElementsByClassName('video-stream')[0].duration;
+                //         console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
+                //     };
+                
                 if (isNaN(parseFloat(vidDuration))) 
                     {
-                        vidDuration = document.getElementsByClassName('video-stream')[0].duration;
-                        console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
-                    };
-
-                
-                if (vidDuration === null) 
-                {
-                    console.log(`Vid has not started playing yet`)
-                    //  block of code to be executed if the condition is true
-                }
+                        console.log(`Vid ${vidId} has not started playing yet`)
+                        //  block of code to be executed if the condition is true
+                    }
                 else 
                     {
-                        console.log(`Vid has started playing!`)
+                        console.log(`Vid ${vidId} has started playing!`)
+                        if (vidsWatched[vidId] && currentpage != document.URL)
+                        {
+                            // Start the video from last played time
+                            let watchedVidObject = vidsWatched[vidId]
+                            let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
+                            console.log(`Resuming ${vidId} from last location ${latestTimePlayed}`)
+                            document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
+                            currentpage = document.URL
+                        }
+
+
                         // console.log(`Getting current position for video: ${document.URL}`)
                         currentTime = document.getElementsByClassName('video-stream')[0].currentTime;
                         console.log(`Current vid time for ${document.URL}: ${currentTime}`);
-
-                        var fractionWatched =currentTime/vidDuration
+                        var fractionWatched =currentTime/vidDuration;
 
                         if (fractionWatched >= 0.98)
                             {
@@ -255,7 +258,7 @@ function checkPage()
         }
 
         strLastchange = window.location.href + ':' + window.document.title + ':' + objVideocache.length + ':' + objProgresscache.length;
-        console.log(`strLastchange: ${strLastchange}`)
+        // console.log(`strLastchange: ${strLastchange}`)
         refresh();
         
     };
