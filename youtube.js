@@ -66,7 +66,6 @@ function mark (objVideo,percentPlayed, boolMark)
 
             try {
                 element = objVideo.querySelector('.yt-core-attributed-string');
-                objVideo.querySelector('.yt-core-attributed-string').textContent
                 element.textContent = "seen| " + element.textContent
               } 
             catch (err) 
@@ -121,7 +120,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         if (objData.type === "NEW")
             {
                 console.log(`Received message from background that page has changed.`);
-                refresh();
+                // refresh(); Commented out because its causing overlay to run more than once
                 funcResponse(null);
             }
         else if (objData.type === "clearWatchData")
