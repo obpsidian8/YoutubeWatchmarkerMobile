@@ -91,22 +91,26 @@ function createOverlay (objVideo, percentPlayed)
         playbackOverlayElement.style= "width: "+(percentPlayed *100)+"%"
 
         console.log(`About to overlay video: ${objVideo}`);
-        var targetElement = objVideo.lastChild.lastChild
+        var targetElement = objVideo.lastChild.lastChild // target element for mobile page
         if (targetElement === null)
             {
-                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media');
+                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
+                
+                // ###################################################################################################
                 objVideoChild = targetElement.querySelectorAll('.thumbnail-overlay-resume-playback-progress')[0]
                 if (objVideoChild)
                     {
                         console.log(`Overlay already present`)
                         return
                     }
+                // ###################################################################################################
+                
                 targetElement.appendChild(playbackOverlayElement);
-                targetElement.insertBefore(targetElement.querySelectorAll('.youwatch-mark')[0], playbackOverlayElement);
+                targetElement.insertBefore(targetElement.querySelectorAll('.youwatch-mark')[0], playbackOverlayElement); //Placing target element for desktop page
             }
         else
             {
-                targetElement.appendChild(playbackOverlayElement);
+                targetElement.appendChild(playbackOverlayElement); // Placing overlay element for mobile page
             }
             
 
