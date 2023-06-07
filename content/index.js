@@ -43,36 +43,48 @@ document.addEventListener("DOMContentLoaded" ,function ()
             elem.style.width = width + '%'; 
           }
 
-        document.getElementById("clearWatchDataBtn").addEventListener("click", function () {
-                console.log(`Sending signal to content script to clear watchData.`)
-                window.localStorage.removeItem("watchData"); // Clears the data on the backend
-                window.localStorage.setItem("watchData", JSON.stringify({}));
-                
-                const clearMsg = document.createElement("p");
-                clearMsg.style = "text-align: center;"
-                clearMsg.id = "dataClearMsg"
-                clearMsg.textContent = "Watch Data Cleared!"
-                document.querySelectorAll(".clearBtn")[0].appendChild(clearMsg);
+        document.getElementById("clearWatchDataBtn").addEventListener("click", function (e) 
+            {
+                if( ! confirm("Do you really want clear all Watch data?") )
+                    {
+                        e.preventDefault();
+                        alert('Watch data not cleared'); // ! => don't want to do this
+                    } 
+                else 
+                    {
+                        //want to do this! => maybe do something about it?
+                        alert('Ok, lets do this!');
+                        window.localStorage.removeItem("watchData"); // Clears the data on the backend
+                        window.localStorage.setItem("watchData", JSON.stringify({}));
+                        
+                        const clearMsg = document.createElement("p");
+                        clearMsg.style = "text-align: center;"
+                        clearMsg.id = "dataClearMsg"
+                        clearMsg.textContent = "Watch Data Cleared!"
+                        document.querySelectorAll(".clearBtn")[0].appendChild(clearMsg);
+        
+                        setTimeout(function () {
+                            document.getElementById('dataClearMsg').style.display = 'none'
+                            document.location.reload()
+                        }, 3000)
+        
+                        // Send message to content script to also clear the storage there
+                        console.log(`Sending signal to content script to clear watchData.`)
+                        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                            chrome.tabs.sendMessage(tabs[0].id, 
+                                {
+                                    message: "autoFill",
+                                    type: "clearWatchData" 
+                                }, function(response) {})
+                        })
+        
+                        // END SEND MESSAGE
+                    }
+            
+            
 
-                setTimeout(function () {
-                    document.getElementById('dataClearMsg').style.display = 'none'
-                    document.location.reload()
-                }, 3000)
-
-                // Send message to content script to also clear the storage there
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    chrome.tabs.sendMessage(tabs[0].id, 
-                        {
-                            message: "autoFill",
-                            type: "clearWatchData" 
-                        }, function(response) {})
-                })
-
-                // END SEND MESSAGE
-                
             }
         );
-
         
         document.getElementById("showWatchDataBtn").addEventListener("click", function () 
             {
@@ -97,8 +109,8 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 const infoEleVidId = document.createElement("span");
 
                                 infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
-                                infoElePercentPlayed.textContent = " Percent played: " +((currentWatchDataObj[property].timeInfo.percentPlayed).toFixed(2))*100 +"%" + " (" + currentWatchDataObj[property].timeInfo.currentTime + "secs )"
-                                infoEleVidId.textContent =  " vid id: " + currentWatchDataObj[property].vidId
+                                infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
+                                infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
                                 // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
                                 document.querySelectorAll('.watchdata_details')[0].appendChild(container);
