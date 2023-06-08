@@ -46,7 +46,7 @@ header img {
   font-weight: bold; 
   position: center;
   align-items: center;
-  display:block;
+  display:block
 }
 
 .watchDataDiv {
@@ -71,6 +71,10 @@ header img {
   display: none;
   border-radius: 6px;
   align-items: center;
+}
+
+.watchDataDiv:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .showDataBtn,
