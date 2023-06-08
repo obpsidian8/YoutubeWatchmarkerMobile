@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 if( ! confirm("Do you really want clear all Watch data?") )
                     {
                         e.preventDefault();
-                        alert('Watch data not cleared'); // ! => don't want to do this
+                        // alert('Watch data not cleared'); // ! => don't want to do this
                     } 
                 else 
                     {
