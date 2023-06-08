@@ -113,13 +113,24 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
                                 // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
-                                document.querySelectorAll('.watchdata_details')[0].appendChild(container);
-
                                 container.appendChild(infoEleTitle);
                                 container.appendChild(divider);
                                 container.appendChild(infoElePercentPlayed);
                                 container.appendChild(dividerA);
                                 container.appendChild(infoEleVidId);
+
+                                firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
+
+                                if (!firstChildEle)
+                                    {
+                                        document.querySelectorAll('.watchdata_details')[0].appendChild(container);
+                                    }
+                                else
+                                    {
+                                        document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
+                                    }
+
+                                
                             }
                     }
 
