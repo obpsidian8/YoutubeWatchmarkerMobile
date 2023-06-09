@@ -43,136 +43,151 @@ document.addEventListener("DOMContentLoaded" ,function ()
             elem.style.width = width + '%'; 
           }
 
-        document.getElementById("clearWatchDataBtn").addEventListener("click", function (e) 
-            {
-                if( ! confirm("Do you really want clear all Watch data?") )
-                    {
-                        e.preventDefault();
-                        // alert('Watch data not cleared'); // ! => don't want to do this
-                    } 
-                else 
-                    {
-                        //want to do this! => maybe do something about it?
-                        alert('Ok, lets do this!');
-                        window.localStorage.removeItem("watchData"); // Clears the data on the backend
-                        window.localStorage.setItem("watchData", JSON.stringify({}));
-                        
-                        const clearMsg = document.createElement("p");
-                        clearMsg.style = "text-align: center;"
-                        clearMsg.id = "dataClearMsg"
-                        clearMsg.textContent = "Watch Data Cleared!"
-                        document.querySelectorAll(".clearBtn")[0].appendChild(clearMsg);
-        
-                        setTimeout(function () {
-                            document.getElementById('dataClearMsg').style.display = 'none'
-                            document.location.reload()
-                        }, 3000)
-        
-                        // Send message to content script to also clear the storage there
-                        console.log(`Sending signal to content script to clear watchData.`)
-                        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                            chrome.tabs.sendMessage(tabs[0].id, 
-                                {
-                                    message: "autoFill",
-                                    type: "clearWatchData" 
-                                }, function(response) {})
-                        })
-        
-                        // END SEND MESSAGE
-                    }
-            
-            
-
-            }
-        );
-        
-        document.getElementById("showWatchDataBtn").addEventListener("click", function () 
-            {
-                var watchdata_details_ele = document.getElementById("watchdata_details");
-                if (watchdata_details_ele.style.display==="none" ||  watchdata_details_ele.style.display==="")
-                    {
-                        watchdata_details_ele.style.display = "block";
-                        // Get details of watchData
-                        var currentWatchDataObj = window.localStorage.getItem("watchData");
-                        currentWatchDataObj = JSON.parse(currentWatchDataObj);
-                        for (property in currentWatchDataObj)
+        document.getElementById("clearWatchDataBtn").addEventListener("click", clearWatchData);
+        function clearWatchData (e) 
+        {
+            if( ! confirm("Do you really want clear all Watch data?") )
+                {
+                    e.preventDefault();
+                    // alert('Watch data not cleared'); // ! => don't want to do this
+                } 
+            else 
+                {
+                    //want to do this! => maybe do something about it?
+                    alert('Ok, lets do this!');
+                    window.localStorage.removeItem("watchData"); // Clears the data on the backend
+                    window.localStorage.setItem("watchData", JSON.stringify({}));
+                    
+                    const clearMsg = document.createElement("p");
+                    clearMsg.style = "text-align: center;"
+                    clearMsg.id = "dataClearMsg"
+                    clearMsg.textContent = "Watch Data Cleared!"
+                    document.querySelectorAll(".clearBtn")[0].appendChild(clearMsg);
+    
+                    setTimeout(function () {
+                        document.getElementById('dataClearMsg').style.display = 'none'
+                        document.location.reload()
+                    }, 3000)
+    
+                    // Send message to content script to also clear the storage there
+                    console.log(`Sending signal to content script to clear watchData.`)
+                    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                        chrome.tabs.sendMessage(tabs[0].id, 
                             {
-                                const container = document.createElement("div");
-                                container.className = "watchDataDiv"
-
-                                const divider = document.createElement("hr")
-                                divider.className = "divider"
-                                const dividerA = divider.cloneNode(true);
-
-                                const infoEleTitle = document.createElement("span");
-                                const infoElePercentPlayed = document.createElement("span");
-                                const infoEleVidId = document.createElement("span");
-
-                                infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
-                                infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
-                                infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
-                                // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
-
-                                container.appendChild(infoEleTitle);
-                                container.appendChild(divider);
-                                container.appendChild(infoElePercentPlayed);
-                                container.appendChild(dividerA);
-                                container.appendChild(infoEleVidId);
-
-                                firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
-
-                                if (!firstChildEle)
-                                    {
-                                        document.querySelectorAll('.watchdata_details')[0].appendChild(container);
-                                    }
-                                else
-                                    {
-                                        document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
-                                    }
-
-                                
-                            }
-                    }
-
-                else
-                    {
-                        watchdata_details_ele.style.display = "none";
-                        document.getElementsByClassName("watchDataDiv")[0].remove()
-                        document.location.reload();
-                        return
-                    }
+                                message: "autoFill",
+                                type: "clearWatchData" 
+                            }, function(response) {})
+                    })
+    
+                    // END SEND MESSAGE
+                }
+        }
+        
+        document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
+        function showWatchData () 
+        {
+            // Sync data first
+            dataToSend =  {
+                message: "autoFill",
+                type: "syncData" 
             }
-        );
-
-        document.getElementById("syncWatchDataBtn").addEventListener("click", function()
-            {
-                // Sets/syncs the backend watchData witn the response from front end
-                // Send message to content script to fetch data
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    chrome.tabs.sendMessage(tabs[0].id, 
-                        {
-                            message: "autoFill",
-                            type: "syncData" 
-                        }, function(response) {
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
                             console.log(response) // Data received from front end as JSON
                             window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
-
-                            const syncMsg = document.createElement("p");
-                            syncMsg.style = "text-align: center;"
-                            syncMsg.id = "syncClearMsg"
-                            syncMsg.textContent = "Watch Data Synced!"
-                            document.querySelectorAll(".syncDataBtn")[0].appendChild(syncMsg);
+                        }
+                    )
+            })
             
-                            setTimeout(function () {
-                                document.getElementById('syncClearMsg').style.display = 'none'
-                                document.location.reload()
-                            }, 3000)
-                        })
-                })
+            // Show data section
+            var watchdata_details_ele = document.getElementById("watchdata_details");
+            if (watchdata_details_ele.style.display==="none" ||  watchdata_details_ele.style.display==="")
+                {
+                    watchdata_details_ele.style.display = "block";
+                    // Get details of watchData
+                    var currentWatchDataObj = window.localStorage.getItem("watchData");
+                    currentWatchDataObj = JSON.parse(currentWatchDataObj);
+                    for (property in currentWatchDataObj)
+                        {
+                            const container = document.createElement("div");
+                            container.className = "watchDataDiv"
 
-                // END SEND MESSAGE
+                            const divider = document.createElement("hr")
+                            divider.className = "divider"
+                            const dividerA = divider.cloneNode(true);
+
+                            const infoEleTitle = document.createElement("span");
+                            const infoElePercentPlayed = document.createElement("span");
+                            const infoEleVidId = document.createElement("span");
+
+                            infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
+                            infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
+                            infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
+                            // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
+
+                            container.appendChild(infoEleTitle);
+                            container.appendChild(divider);
+                            container.appendChild(infoElePercentPlayed);
+                            container.appendChild(dividerA);
+                            container.appendChild(infoEleVidId);
+
+                            firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
+
+                            if (!firstChildEle)
+                                {
+                                    document.querySelectorAll('.watchdata_details')[0].appendChild(container);
+                                }
+                            else
+                                {
+                                    document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
+                                }
+
+                            
+                        }
+                }
+
+            else
+                {
+                    watchdata_details_ele.style.display = "none";
+                    document.getElementsByClassName("watchDataDiv")[0].remove()
+                    document.location.reload();
+                    return
+                }
+        }
+
+        document.getElementById("syncWatchDataBtn").addEventListener("click", syncWatchData);
+        function syncWatchData ()
+        {
+            
+            // Sets/syncs the backend watchData witn the response from front end
+            // Send message to content script to fetch data
+            dataToSend =  {
+                message: "autoFill",
+                type: "syncData" 
             }
-        );
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
+                            console.log(response) // Data received from front end as JSON
+                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+                        }
+                    )
+            })
+            // END SEND MESSAGE
+            // Message Display section
+            const syncMsg = document.createElement("p");
+            syncMsg.style = "text-align: center;"
+            syncMsg.id = "syncClearMsg"
+            syncMsg.textContent = "Watch Data Synced!"
+            document.querySelectorAll(".syncDataBtn")[0].appendChild(syncMsg);
+
+            setTimeout(function () {
+                document.getElementById('syncClearMsg').style.display = 'none'
+                document.location.reload()
+            }, 3000)
+
+        }
         
     }
 );
