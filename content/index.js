@@ -84,22 +84,20 @@ document.addEventListener("DOMContentLoaded" ,function ()
         }
         
         document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
-        function showWatchData () 
+        async function showWatchData () 
         {
             // Sync data first
             dataToSend =  {
                 message: "autoFill",
                 type: "syncData" 
             }
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    chrome.tabs.sendMessage(
-                        tabs[0].id, dataToSend, function(response) {
-                            console.log(response) // Data received from front end as JSON
-                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
-                        }
-                    )
-            })
-            
+
+            const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+            const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
+            // do something with response here, not outside the function
+            console.log(response);
+            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+
             // Show data section
             var watchdata_details_ele = document.getElementById("watchdata_details");
             if (watchdata_details_ele.style.display==="none" ||  watchdata_details_ele.style.display==="")
@@ -157,7 +155,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
         }
 
         document.getElementById("syncWatchDataBtn").addEventListener("click", syncWatchData);
-        function syncWatchData ()
+        async function syncWatchData ()
         {
             
             // Sets/syncs the backend watchData witn the response from front end
@@ -166,14 +164,12 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 message: "autoFill",
                 type: "syncData" 
             }
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    chrome.tabs.sendMessage(
-                        tabs[0].id, dataToSend, function(response) {
-                            console.log(response) // Data received from front end as JSON
-                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
-                        }
-                    )
-            })
+            const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+            const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
+            // do something with response here, not outside the function
+            console.log(response);
+            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+
             // END SEND MESSAGE
             // Message Display section
             const syncMsg = document.createElement("p");

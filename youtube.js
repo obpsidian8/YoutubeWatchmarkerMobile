@@ -12,19 +12,23 @@ var currentpage = null;
 
 console.log(`Loading watchData via content script`)
 
-// Data will be refreshed each time the page is loaded
-var vidsWatched = window.localStorage.getItem("watchData"); //STRING
-if (!vidsWatched)
+function initWatchData ()
     {
-        var vidsWatched = {}; //JSON
-        window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //STRING
-    }
-else
-    {
-        var vidsWatched = JSON.parse(vidsWatched) //JSON
-    }
+        // Data will be refreshed each time the page is loaded
+        vidsWatched = window.localStorage.getItem("watchData"); //STRING
+        if (!vidsWatched)
+            {
+                vidsWatched = {}; //JSON
+                window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //STRING
+            }
+        else
+            {
+                vidsWatched = JSON.parse(vidsWatched) //JSON
+            }
+        
+    };
+initWatchData();
 console.log(vidsWatched)
-
 // ##########################################################
 function refresh ()
     {
@@ -97,7 +101,13 @@ function createOverlay (objVideo, percentPlayed)
                 targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
                 
                 // ###################################################################################################
-                objVideoChild = targetElement.querySelectorAll('.thumbnail-overlay-resume-playback-progress')[0]
+                objVideoChild = null
+                objVideoChildList = targetElement.querySelectorAll('.thumbnail-overlay-resume-playback-progress')
+                if (objVideoChildList)
+                    {
+                        objVideoChild = objVideoChildList[0]
+                    }
+
                 if (objVideoChild)
                     {
                         console.log(`Overlay already present`)
@@ -124,7 +134,6 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         if (objData.type === "NEW")
             {
                 console.log(`Received message from background that page has changed.`);
-                // refresh(); Commented out because its causing overlay to run more than once
                 funcResponse(null);
             }
         else if (objData.type === "clearWatchData")
@@ -137,6 +146,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         else if (objData.type === "syncData")
         {
             console.log(`Received syncDataBtn  message from content. Sending back watchdata:`);
+            initWatchData();
             funcResponse({"data": vidsWatched});
         }
         console.log("Done messageReceivedProcess")
@@ -159,7 +169,6 @@ function checkPage()
         // if (document.hidden === true) {
         //     return;
         // }
-
         if (document.URL.includes("youtube.com/watch")) 
             {
                 var vidId = document.URL.split('v=')[1].split("#")[0];
@@ -185,6 +194,7 @@ function checkPage()
                 else 
                     {
                         console.log(`Vid ${vidId} has started playing!`)
+                        
                         if (vidsWatched[vidId] && currentpage != document.URL)
                         {
                             // Start the video from last played time
@@ -209,8 +219,6 @@ function checkPage()
                         // else
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
-                                // Send message to backend with time of video
-                                console.log(`Sending current vid details to background`)
                                 message = { "timeInfo": {  "currentTime":currentTime, 
                                                         "totalDuration": vidDuration, 
                                                         },
@@ -220,15 +228,6 @@ function checkPage()
                                             "vidId": vidId
                                         }
 
-                                chrome.runtime.sendMessage
-                                (message, 
-                                            function (response) 
-                                            {
-                                                // console.log();
-                                            }
-
-                                );
-                                            
                                 // Save data to localStorage from frontend
                                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                                 var details = { 
