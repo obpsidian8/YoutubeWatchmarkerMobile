@@ -93,6 +93,12 @@ document.addEventListener("DOMContentLoaded" ,function ()
             }
 
             const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+            if (!tab.url.includes("youtube.com"))
+            {
+                console.log('Not on a youtube page');
+                alert("Not on a youtube page");
+                return
+            }
             const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
             // do something with response here, not outside the function
             console.log(response);
@@ -165,6 +171,13 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 type: "syncData" 
             }
             const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+            if (!tab.url.includes("youtube.com"))
+                {
+                    console.log('Not on a youtube page');
+                    alert("Not on a youtube page");
+                    return
+                }
+
             const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
             // do something with response here, not outside the function
             console.log(response);
