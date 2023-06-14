@@ -149,6 +149,15 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             initWatchData();
             funcResponse({"data": vidsWatched});
         }
+        else if (objData.type === "importData")
+        {
+            console.log(`Received importData  message from popup.`);
+            console.log(objData.data)
+            responseMessage = {
+                message: "Frontend has processed imported data"
+            }
+            funcResponse(responseMessage);
+        }
         console.log("Done messageReceivedProcess")
         
         return true
@@ -178,7 +187,10 @@ function checkPage()
                 }
 
                 vidDuration = document.getElementsByClassName('video-stream')[0].duration;
-                console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
+                if (checkPageCount % 20 === 0)
+                {
+                    console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
+                }
                 
                 // if (isNaN(parseFloat(vidDuration))) 
                 //     {
@@ -188,12 +200,18 @@ function checkPage()
                 
                 if (isNaN(parseFloat(vidDuration))) 
                     {
-                        console.log(`Vid ${vidId} has not started playing yet`)
-                        //  block of code to be executed if the condition is true
+                        if (checkPageCount % 20 === 0)
+                        {
+                            console.log(`Vid ${vidId} has not started playing yet`)
+                        }
                     }
                 else 
                     {
-                        console.log(`Vid ${vidId} has started playing!`)
+                        
+                        if (checkPageCount % 20 === 0)
+                        {
+                            console.log(`Vid ${vidId} has started playing!`)
+                        }
                         
                         if (vidsWatched[vidId] && currentpage != document.URL)
                         {

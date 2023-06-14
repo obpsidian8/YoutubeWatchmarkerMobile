@@ -172,9 +172,6 @@ document.addEventListener("DOMContentLoaded" ,function ()
         document.getElementById("exportWatchDataBtn").addEventListener("click", exportWatchData);
         function exportWatchData ()
         {
-            
-            // Sets/syncs the backend watchData witn the response from front end
-            // Send message to content script to fetch data
             dataToSend =  {
                 message: "autoFill",
                 type: "syncData" 
@@ -193,20 +190,101 @@ document.addEventListener("DOMContentLoaded" ,function ()
                             chrome.tabs.sendMessage(
                                 tabs[0].id, dataToSend, function(response) {
                                     console.log(response) // Data received from front end as JSON
-                                    window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
 
-                                    const container = document.createElement("div");
-                                    container.className = "watchDataTextDiv"
-                                    const infoEleTitle = document.createElement("span");
-                                    infoEleTitle.textContent = JSON.stringify(response.data)
+                                    var contentType = 'text/json';
+                                    var jsonFile = new Blob([JSON.stringify(response.data)], {type: contentType});
+        
+                                    var a = document.createElement('a');
+                                    a.download = 'watchdata.json';
+                                    a.href = window.URL.createObjectURL(jsonFile);
+                                    a.textContent = 'Watchdata download link';
+        
+                                    a.dataset.downloadurl = [contentType, a.download, a.href].join(':');
+        
+                                    document.body.appendChild(a);
+                                    
+                                    // // Display watchdata section
+                                    // const container = document.createElement("div");
+                                    // container.className = "watchDataTextDiv"
+                                    // const infoEleTitle = document.createElement("span");
+                                    // infoEleTitle.textContent = JSON.stringify(response.data)
                         
-                                    container.appendChild(infoEleTitle);
-                                    document.querySelectorAll('.exportdata_details')[0].appendChild(container);
+                                    // container.appendChild(infoEleTitle);
+                                    // document.body.appendChild(container);
                                 }
                             )
                         }
             )
         }
+
+        // IMPORT WATCH DATA SECTION
+        document.getElementById("importWatchDataBtn").addEventListener("click", importWatchData);
+        function importWatchData ()
+        {
+            // Sets/syncs the backend watchData witn the response from front end
+            // Send message to content script to fetch data
+
+                chrome.tabs.query(
+                    {active: true, currentWindow: true}, function(tabs) 
+                        {
+                            console.log(`Current Page: ${tabs[0].url}`)
+                            if (!tabs[0].url.includes("youtube.com"))
+                            {
+                                console.log('Not on a youtube page');
+                                alert("Switch to a Youtube tab to run");
+                                return
+                            }
+
+                            var inputForm = document.createElement('input');
+                            inputForm.type = "file"
+                            inputForm.id = "jsonFile"
+                            inputForm.accept = ".json"
+
+                            var submitForm = document.createElement('input');
+                            submitForm.type = "submit"
+                            submitForm.value = "Submit"
+
+                            document.querySelectorAll('.importControls')[0].appendChild(inputForm)
+                            document.querySelectorAll('.importControls')[0].appendChild(document.createElement("br"))
+                            document.querySelectorAll('.importControls')[0].appendChild(submitForm)
+                            document.querySelectorAll('.importControls')[0].after(document.createElement("br"))
+
+                            const myForm = document.getElementById("importControls");
+                            const jsonFile = document.getElementById("jsonFile");
+
+                            myForm.addEventListener("submit", function (e) {
+                                e.preventDefault();
+                                const input =jsonFile.files[0];
+                                const reader  = new FileReader();
+                                reader.onload = function (e) 
+                                {
+                                   const text = e.target.result;
+                                   document.write(text);
+
+                                   dataToSend =  {
+                                    message: "autoFill",
+                                    type: "importData" ,
+                                    data: JSON.parse(text)
+                                }
+
+                                chrome.tabs.sendMessage(
+                                    tabs[0].id, dataToSend, function(response) {
+                                        console.log(response) // Data received from front end as JSON
+    
+                                        //Display message from front end that data has been received
+    
+                                    }
+                                )
+
+                                };
+                                reader.readAsText(input);
+                             });
+                            
+
+                        }
+            )
+        }
+        
         
     }
 );

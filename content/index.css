@@ -78,8 +78,10 @@ header img {
   background: rgba(0, 0, 0, 0.2);
 }
 
+
 .showDataBtn,
 .exportDataBtn,
+.importDataBtn,
 .syncDataBtn,
 .clearBtn {
   align-items: center;
