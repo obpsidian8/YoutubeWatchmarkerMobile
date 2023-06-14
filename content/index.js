@@ -83,8 +83,9 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 }
         }
         
+        // EXPORT SHOW DATA SECTION
         document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
-        async function showWatchData () 
+        function showWatchData () 
         {
             // Sync data first
             dataToSend =  {
@@ -95,112 +96,79 @@ document.addEventListener("DOMContentLoaded" ,function ()
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
                 {
                     console.log(`Current Page: ${tabs[0].url}`)
+                    if (!tabs[0].url.includes("youtube.com"))
+                    {
+                        console.log('Not on a youtube page');
+                        alert("Switch to a Youtube tab to run");
+                        return
+                    }
                     
                     chrome.tabs.sendMessage(
                         tabs[0].id, dataToSend, function(response) {
                             console.log(response) // Data received from front end as JSON
-                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
-                        }
-                    )
-                }
-            )
-
-            // Show data section
-            var watchdata_details_ele = document.getElementById("watchdata_details");
-            if (watchdata_details_ele.style.display==="none" ||  watchdata_details_ele.style.display==="")
-                {
-                    watchdata_details_ele.style.display = "block";
-                    // Get details of watchData
-                    var currentWatchDataObj = window.localStorage.getItem("watchData");
-                    currentWatchDataObj = JSON.parse(currentWatchDataObj);
-                    for (property in currentWatchDataObj)
-                        {
-                            const container = document.createElement("div");
-                            container.className = "watchDataDiv"
-
-                            const divider = document.createElement("hr")
-                            divider.className = "divider"
-                            const dividerA = divider.cloneNode(true);
-
-                            const infoEleTitle = document.createElement("span");
-                            const infoElePercentPlayed = document.createElement("span");
-                            const infoEleVidId = document.createElement("span");
-
-                            infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
-                            infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
-                            infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
-                            // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
-
-                            container.appendChild(infoEleTitle);
-                            container.appendChild(divider);
-                            container.appendChild(infoElePercentPlayed);
-                            container.appendChild(dividerA);
-                            container.appendChild(infoEleVidId);
-
-                            firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
-
-                            if (!firstChildEle)
+                            
+                            // Show data section
+                            var watchdata_details_ele = document.getElementById("watchdata_details");
+                            if (watchdata_details_ele.style.display==="none" ||  watchdata_details_ele.style.display==="")
                                 {
-                                    document.querySelectorAll('.watchdata_details')[0].appendChild(container);
+                                    watchdata_details_ele.style.display = "block";
+                                    // Get details of watchData
+                                    var currentWatchDataObj = response.data;
+                                    // currentWatchDataObj = JSON.parse(currentWatchDataObj);
+                                    for (property in currentWatchDataObj)
+                                        {
+                                            const container = document.createElement("div");
+                                            container.className = "watchDataDiv"
+
+                                            const divider = document.createElement("hr")
+                                            divider.className = "divider"
+                                            const dividerA = divider.cloneNode(true);
+
+                                            const infoEleTitle = document.createElement("span");
+                                            const infoElePercentPlayed = document.createElement("span");
+                                            const infoEleVidId = document.createElement("span");
+
+                                            infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
+                                            infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
+                                            infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
+                                            // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
+
+                                            container.appendChild(infoEleTitle);
+                                            container.appendChild(divider);
+                                            container.appendChild(infoElePercentPlayed);
+                                            container.appendChild(dividerA);
+                                            container.appendChild(infoEleVidId);
+
+                                            firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
+
+                                            if (!firstChildEle)
+                                                {
+                                                    document.querySelectorAll('.watchdata_details')[0].appendChild(container);
+                                                }
+                                            else
+                                                {
+                                                    document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
+                                                }
+                                        }
                                 }
+
                             else
                                 {
-                                    document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
+                                    watchdata_details_ele.style.display = "none";
+                                    document.getElementsByClassName("watchDataDiv")[0].remove()
+                                    document.location.reload();
+                                    return
                                 }
 
-                            
-                        }
-                }
 
-            else
-                {
-                    watchdata_details_ele.style.display = "none";
-                    document.getElementsByClassName("watchDataDiv")[0].remove()
-                    document.location.reload();
-                    return
-                }
-        }
-
-        document.getElementById("syncWatchDataBtn").addEventListener("click", syncWatchData);
-        function syncWatchData ()
-        {
-            
-            // Sets/syncs the backend watchData witn the response from front end
-            // Send message to content script to fetch data
-            dataToSend =  {
-                message: "autoFill",
-                type: "syncData" 
-            }
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
-                {
-                    console.log(`Current Page: ${tabs[0].url}`)
-                    
-                    chrome.tabs.sendMessage(
-                        tabs[0].id, dataToSend, function(response) {
-                            console.log(response) // Data received from front end as JSON
-                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
                         }
                     )
                 }
             )
 
-            // END SEND MESSAGE
-            // Message Display section
-            const syncMsg = document.createElement("p");
-            syncMsg.style = "text-align: center;"
-            syncMsg.id = "syncClearMsg"
-            syncMsg.textContent = "Watch Data Synced!"
-            document.querySelectorAll(".syncDataBtn")[0].appendChild(syncMsg);
-
-            setTimeout(function () {
-                document.getElementById('syncClearMsg').style.display = 'none'
-                document.location.reload()
-            }, 3000)
         }
-         function func()
-          {}
 
-
+        // EXPORT WATCH DATA SECTION
         document.getElementById("exportWatchDataBtn").addEventListener("click", exportWatchData);
         function exportWatchData ()
         {
@@ -211,29 +179,33 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 message: "autoFill",
                 type: "syncData" 
             }
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
-                {
-                    console.log(`Current Page: ${tabs[0].url}`)
+                chrome.tabs.query(
+                    {active: true, currentWindow: true}, function(tabs) 
+                        {
+                            console.log(`Current Page: ${tabs[0].url}`)
+                            if (!tabs[0].url.includes("youtube.com"))
+                            {
+                                console.log('Not on a youtube page');
+                                alert("Switch to a Youtube tab to run");
+                                return
+                            }
 
-                    chrome.tabs.sendMessage(
-                        tabs[0].id, dataToSend, function(response) {
-                            console.log(response) // Data received from front end as JSON
-                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+                            chrome.tabs.sendMessage(
+                                tabs[0].id, dataToSend, function(response) {
+                                    console.log(response) // Data received from front end as JSON
+                                    window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
 
-                            const container = document.createElement("div");
-                            container.className = "watchDataTextDiv"
-                            const infoEleTitle = document.createElement("span");
-                            infoEleTitle.textContent = JSON.stringify(response.data)
-                
-                            container.appendChild(infoEleTitle);
-                            document.querySelectorAll('.exportdata_details')[0].appendChild(container);
+                                    const container = document.createElement("div");
+                                    container.className = "watchDataTextDiv"
+                                    const infoEleTitle = document.createElement("span");
+                                    infoEleTitle.textContent = JSON.stringify(response.data)
+                        
+                                    container.appendChild(infoEleTitle);
+                                    document.querySelectorAll('.exportdata_details')[0].appendChild(container);
+                                }
+                            )
                         }
-                    )
-            }
-        )
-
-
-
+            )
         }
         
     }
