@@ -92,17 +92,18 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 type: "syncData" 
             }
 
-            const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-            if (!tab.url.includes("youtube.com"))
-            {
-                console.log('Not on a youtube page');
-                alert("Not on a youtube page");
-                return
-            }
-            const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
-            // do something with response here, not outside the function
-            console.log(response);
-            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+                {
+                    console.log(`Current Page: ${tabs[0].url}`)
+                    
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
+                            console.log(response) // Data received from front end as JSON
+                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+                        }
+                    )
+                }
+            )
 
             // Show data section
             var watchdata_details_ele = document.getElementById("watchdata_details");
@@ -161,7 +162,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
         }
 
         document.getElementById("syncWatchDataBtn").addEventListener("click", syncWatchData);
-        async function syncWatchData ()
+        function syncWatchData ()
         {
             
             // Sets/syncs the backend watchData witn the response from front end
@@ -170,18 +171,18 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 message: "autoFill",
                 type: "syncData" 
             }
-            const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-            if (!tab.url.includes("youtube.com"))
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
                 {
-                    console.log('Not on a youtube page');
-                    alert("Not on a youtube page");
-                    return
+                    console.log(`Current Page: ${tabs[0].url}`)
+                    
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
+                            console.log(response) // Data received from front end as JSON
+                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+                        }
+                    )
                 }
-
-            const response = await chrome.tabs.sendMessage(tab.id, dataToSend);
-            // do something with response here, not outside the function
-            console.log(response);
-            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+            )
 
             // END SEND MESSAGE
             // Message Display section
@@ -195,6 +196,43 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 document.getElementById('syncClearMsg').style.display = 'none'
                 document.location.reload()
             }, 3000)
+        }
+         function func()
+          {}
+
+
+        document.getElementById("exportWatchDataBtn").addEventListener("click", exportWatchData);
+        function exportWatchData ()
+        {
+            
+            // Sets/syncs the backend watchData witn the response from front end
+            // Send message to content script to fetch data
+            dataToSend =  {
+                message: "autoFill",
+                type: "syncData" 
+            }
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+                {
+                    console.log(`Current Page: ${tabs[0].url}`)
+
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
+                            console.log(response) // Data received from front end as JSON
+                            window.localStorage.setItem("watchData", JSON.stringify(response.data)); // Set the backend watchData witn the response from front end
+
+                            const container = document.createElement("div");
+                            container.className = "watchDataTextDiv"
+                            const infoEleTitle = document.createElement("span");
+                            infoEleTitle.textContent = JSON.stringify(response.data)
+                
+                            container.appendChild(infoEleTitle);
+                            document.querySelectorAll('.exportdata_details')[0].appendChild(container);
+                        }
+                    )
+            }
+        )
+
+
 
         }
         

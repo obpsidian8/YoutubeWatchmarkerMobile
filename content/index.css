@@ -49,6 +49,7 @@ header img {
   display:block
 }
 
+
 .watchDataDiv {
   background: #fff;
    width: 100%;;
@@ -78,6 +79,7 @@ header img {
 }
 
 .showDataBtn,
+.exportDataBtn,
 .syncDataBtn,
 .clearBtn {
   align-items: center;

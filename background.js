@@ -7,10 +7,9 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
         if (tab.url && tab.url.includes("youtube.com"))
             {
                 console.log(`YOUTUBE PAGE: ${tab.url}`);
-                chrome.scripting.insertCSS({
-                    target: { tabId: tab.id },
-                    files: ['youtube.css'],
-                  });
+                chrome.tabs.insertCSS(tab.id, {
+                    file: "youtube.css"
+                });
 
             }
         
