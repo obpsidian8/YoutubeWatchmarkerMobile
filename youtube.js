@@ -15,15 +15,15 @@ console.log(`Loading watchData via content script`)
 function initWatchData ()
     {
         // Data will be refreshed each time the page is loaded
-        vidsWatched = window.localStorage.getItem("watchData"); //STRING
+        vidsWatched = window.localStorage.getItem("watchData"); //getting a STRING
         if (!vidsWatched)
             {
                 vidsWatched = {}; //JSON
-                window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //STRING
+                window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //setting a STRING
             }
         else
             {
-                vidsWatched = JSON.parse(vidsWatched) //JSON
+                vidsWatched = JSON.parse(vidsWatched) //converting string to JSON
             }
         
     };
