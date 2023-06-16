@@ -10,11 +10,10 @@ var vidsWatched  = {}
 var checkPageCount = 0;
 var currentpage = null;
 
-console.log(`Loading watchData via content script`)
-
 function initWatchData ()
     {
         // Data will be refreshed each time the page is loaded
+        console.log(`Loading watchData via content script`)
         vidsWatched = window.localStorage.getItem("watchData"); //getting a STRING
         if (!vidsWatched)
             {
@@ -41,7 +40,7 @@ function refresh ()
         console.log(`   `)
         console.log(`vidsWatched ${vidsWatched}`);
         console.log(vidsWatched);
-        
+
 
         for (vidObj of objVideocache) 
             {
@@ -232,6 +231,7 @@ function checkPage()
                         if (vidsWatched[vidId] && currentpage != document.URL)
                         {
                             // Start the video from last played time
+                            initWatchData() // refresh watch data
                             let watchedVidObject = vidsWatched[vidId]
                             let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
                             console.log(`Resuming ${vidId} from last location ${latestTimePlayed}`)
