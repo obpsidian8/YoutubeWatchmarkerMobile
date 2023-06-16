@@ -35,10 +35,13 @@ function refresh ()
         console.log('Starting function for refresh');
         console.log(`objVideocache ${objVideocache}`);
         console.log(objVideocache);
+        console.log(`   `)
         console.log(`objProgresscache ${objProgresscache}`);
         console.log(objProgresscache);
+        console.log(`   `)
         console.log(`vidsWatched ${vidsWatched}`);
         console.log(vidsWatched);
+        
 
         for (vidObj of objVideocache) 
             {
@@ -94,6 +97,7 @@ function createOverlay (objVideo, percentPlayed)
         playbackOverlayElement.className = "thumbnail-overlay-resume-playback-progress"
         playbackOverlayElement.style= "width: "+(percentPlayed *100)+"%"
 
+        console.log(`   `)
         console.log(`About to overlay video: ${objVideo}`);
         var targetElement = objVideo.lastChild.lastChild // target element for mobile page
         if (targetElement === null)
@@ -153,12 +157,23 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         {
             console.log(`Received importData  message from popup.`);
             console.log(objData.data)
+            for (property in objData.data)
+                {
+                    vidsWatched[property] = objData.data[property]
+                }
+
+            console.log("Merged data:")
+            console.log(vidsWatched)
+
+            console.log(`Setting the new data`);
+            // window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //setting a STRING
+
             responseMessage = {
                 message: "Frontend has processed imported data"
             }
             funcResponse(responseMessage);
         }
-        console.log("Done messageReceivedProcess")
+        console.log("Done with messageReceivedProcess!")
         
         return true
     };
@@ -169,7 +184,8 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 window.setInterval(checkPage, 300);
 function checkPage()
     {
-        if (checkPageCount % 20 === 0)
+        display_every = 20
+        if (checkPageCount % display_every === 0)
             {
                 console.log(`Checking page for new elements ${checkPageCount}`)
             }
@@ -187,7 +203,7 @@ function checkPage()
                 }
 
                 vidDuration = document.getElementsByClassName('video-stream')[0].duration;
-                if (checkPageCount % 20 === 0)
+                if (checkPageCount % display_every === 0)
                 {
                     console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
                 }
@@ -200,7 +216,7 @@ function checkPage()
                 
                 if (isNaN(parseFloat(vidDuration))) 
                     {
-                        if (checkPageCount % 20 === 0)
+                        if (checkPageCount % display_every === 0)
                         {
                             console.log(`Vid ${vidId} has not started playing yet`)
                         }
@@ -208,7 +224,7 @@ function checkPage()
                 else 
                     {
                         
-                        if (checkPageCount % 20 === 0)
+                        if (checkPageCount % display_every === 0)
                         {
                             console.log(`Vid ${vidId} has started playing!`)
                         }
