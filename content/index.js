@@ -1,47 +1,52 @@
 document.addEventListener("DOMContentLoaded" ,function ()
     {
-        var watchData = ""
-        var watchDataDetails = ""
-        console.log("The popup content has been loaded")
-        var _lsTotal = 0,
-        _xLen, _x;
-        for (_x in localStorage) 
-        {
-            if (!localStorage.hasOwnProperty(_x)) 
-                {
-                    continue;
-                }
-                _xLen = ((localStorage[_x].length + _x.length) * 2);
-                _lsTotal += _xLen;
-                console.log(_x.substr(0, 50) + " = " + (_xLen / 1024).toFixed(2) + " KB")
-                if (_x.substr(0, 50).includes("watchData"))
-                    {
-                        watchData = _x.substr(0, 50) + " Usage: " + (_xLen / 1024).toFixed(2) + "KB"
-                        
-                    }
-        };
-        console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
+        console.log("The popup content has been loaded. Querying fronend for usage data.")
+        // Query frontend for storage usage
 
-        if (watchData === "")
-            {
-                watchData = "Total watchData Usage: 0KB"
+        
+        function tabFunction(tabs)
+        {
+            dataToSend =  {
+                message: "autoFill",
+                type: "usage" 
             }
 
-        const TotalUsedEle = document.createElement("p");
-        const watchDataEle = document.createElement("p");
+            chrome.tabs.sendMessage(
+                tabs[0].id, dataToSend, function(response) {
+                    console.log(response) // Data received from front end as JSON
+    
+                    //Display message from front end that data has been received
+                    console.log(response.message)                
+                    var watchData = response.watchData
+                    var _lsTotal = response.total
+                    console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
+                    if (watchData === "")
+                        {
+                            watchData = "Total watchData Usage: 0KB"
+                        }
+            
+                    const TotalUsedEle = document.createElement("p");
+                    const watchDataEle = document.createElement("p");
+            
+                    TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
+                    watchDataEle.textContent = watchData
+                    document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
+                    document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
+            
+                    var elem = document.getElementById("myBar");   
+                    var width = 0;
+                    var id = setInterval(frame, 10);
+                    function frame() {
+                        width = (_lsTotal / 1024).toFixed(2) / 5000; 
+                        elem.style.width = width + '%'; 
+                    }
+                }
+            )
+        }
 
-        TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
-        watchDataEle.textContent = watchData
-        document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
-        document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
+        chrome.tabs.query({active: true, currentWindow: true}, tabFunction)
 
-        var elem = document.getElementById("myBar");   
-        var width = 0;
-        var id = setInterval(frame, 10);
-        function frame() {
-            width = (_lsTotal / 1024).toFixed(2) / 5000; 
-            elem.style.width = width + '%'; 
-          }
+
 
         document.getElementById("clearWatchDataBtn").addEventListener("click", clearWatchData);
         function clearWatchData (e) 
@@ -71,13 +76,16 @@ document.addEventListener("DOMContentLoaded" ,function ()
     
                     // Send message to content script to also clear the storage there
                     console.log(`Sending signal to content script to clear watchData.`)
-                    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    function clearWatchTabFunc(tabs)
+                    {
                         chrome.tabs.sendMessage(tabs[0].id, 
                             {
                                 message: "autoFill",
                                 type: "clearWatchData" 
                             }, function(response) {})
-                    })
+                    }
+
+                    chrome.tabs.query({active: true, currentWindow: true}, clearWatchTabFunc)
     
                     // END SEND MESSAGE
                 }
@@ -93,7 +101,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 type: "syncData" 
             }
 
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+            function showWatchtFunct (tabs) 
                 {
                     console.log(`Current Page: ${tabs[0].url}`)
                     if (!tabs[0].url.includes("youtube.com"))
@@ -164,7 +172,8 @@ document.addEventListener("DOMContentLoaded" ,function ()
                         }
                     )
                 }
-            )
+            
+            chrome.tabs.query({active: true, currentWindow: true}, showWatchtFunct)
 
         }
 
@@ -176,8 +185,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 message: "autoFill",
                 type: "syncData" 
             }
-                chrome.tabs.query(
-                    {active: true, currentWindow: true}, function(tabs) 
+            function exportTabFunc(tabs) 
                         {
                             console.log(`Current Page: ${tabs[0].url}`)
                             if (!tabs[0].url.includes("youtube.com"))
@@ -214,7 +222,8 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 }
                             )
                         }
-            )
+
+            chrome.tabs.query({active: true, currentWindow: true}, exportTabFunc)
         }
 
         // IMPORT WATCH DATA SECTION
@@ -224,8 +233,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
             // Sets/syncs the backend watchData witn the response from front end
             // Send message to content script to fetch data
 
-                chrome.tabs.query(
-                    {active: true, currentWindow: true}, function(tabs) 
+            function importTabFunct(tabs) 
                         {
                             console.log(`Current Page: ${tabs[0].url}`)
                             if (!tabs[0].url.includes("youtube.com"))
@@ -282,7 +290,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                             
 
                         }
-            )
+            chrome.tabs.query({active: true, currentWindow: true}, importTabFunct)
         }
         
         

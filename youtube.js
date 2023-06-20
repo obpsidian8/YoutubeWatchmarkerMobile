@@ -139,6 +139,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                 console.log(`Received message from background that page has changed.`);
                 funcResponse(null);
             }
+
         else if (objData.type === "clearWatchData")
             {
                 console.log(`Received clearWatchData  message from content. Details:`);
@@ -146,12 +147,45 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                 window.localStorage.setItem("watchData", JSON.stringify({}));
                 funcResponse(null);
             }
+
+        else if (objData.type === "usage")
+        {
+            console.log(`Received usage  message from content. Details:`);
+            var watchData = ""
+            var _lsTotal = 0,
+            _xLen, _x;
+            for (_x in localStorage) 
+            {
+                if (!localStorage.hasOwnProperty(_x)) 
+                    {
+                        continue;
+                    }
+                    _xLen = ((localStorage[_x].length + _x.length) * 2);
+                    _lsTotal += _xLen;
+                    console.log(_x.substr(0, 50) + " = " + (_xLen / 1024).toFixed(2) + " KB")
+                    if (_x.substr(0, 50).includes("watchData"))
+                        {
+                            watchData = _x.substr(0, 50) + " Usage: " + (_xLen / 1024).toFixed(2) + "KB"
+                            
+                        }
+            };
+            console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
+            
+            responseMessage = {
+                message: "Frontend has processed usage request",
+                total : _lsTotal,
+                watchData: watchData
+            }
+            funcResponse(responseMessage);
+        }
+
         else if (objData.type === "syncData")
         {
             console.log(`Received syncDataBtn  message from content. Sending back watchdata:`);
             initWatchData();
             funcResponse({"data": vidsWatched});
         }
+
         else if (objData.type === "importData")
         {
             console.log(`Received importData  message from popup.`);
