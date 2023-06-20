@@ -165,7 +165,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             console.log(vidsWatched)
 
             console.log(`Setting the new data`);
-            // window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //setting a STRING
+            window.localStorage.setItem("watchData", JSON.stringify(vidsWatched)) //setting a STRING
 
             responseMessage = {
                 message: "Frontend has processed imported data"
