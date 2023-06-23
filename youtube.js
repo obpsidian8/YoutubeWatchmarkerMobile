@@ -1,4 +1,8 @@
-console.log("loading youtube.js")
+
+console.log(`loading youtube.js. Current status: ${window.contentScriptInjected}`)
+if (window.contentScriptInjected !== true) {
+    window.contentScriptInjected = true
+}
 var strLastchange = null;
 var objVideocache = [];
 var objProgresscache = [];
@@ -102,6 +106,11 @@ function createOverlay (objVideo, percentPlayed)
         if (targetElement === null)
             {
                 targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
+                if (targetElement === null)
+                    {
+                        console.log(`Current element not on page. Moving on`)
+                        return
+                    }
                 
                 // ###################################################################################################
                 objVideoChild = null
@@ -170,7 +179,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                         }
             };
             console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
-            
+
             responseMessage = {
                 message: "Frontend has processed usage request",
                 total : _lsTotal,

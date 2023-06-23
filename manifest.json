@@ -12,7 +12,7 @@
    },
    "content_scripts": [ {
       "css": [ "youtube.css" ],
-      "js": [ "youtube.js" ],
+      "js": ["youtube.js"],
       "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ]
    } ],
    "description": "Automatically mark videos on Youtube mobile and desktop that you have already watched.",
@@ -23,5 +23,5 @@
    "manifest_version": 2,
    "name": "Watchmarker Mobile",
    "permissions": [ "alarms","storage", "downloads", "history", "tabs", "cookies", "webRequest", "webRequestBlocking", "*://www.youtube.com/*", "*://*.ytimg.com/vi/*/*", "*://m.youtube.com/*"],
-   "version": "1.6.4"
+   "version": "1.6.6"
 }

@@ -11,6 +11,14 @@ document.addEventListener("DOMContentLoaded" ,function ()
                 type: "usage" 
             }
 
+            console.log(`Current Page: ${tabs[0].url}`)
+            if (!tabs[0].url.includes("youtube.com"))
+            {
+                console.log('Not on a youtube page');
+                alert("Switch to a Youtube tab to run");
+                return
+            }
+            
             chrome.tabs.sendMessage(
                 tabs[0].id, dataToSend, function(response) {
                     console.log(response) // Data received from front end as JSON
