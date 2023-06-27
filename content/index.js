@@ -13,44 +13,51 @@ document.addEventListener("DOMContentLoaded" ,function ()
 
             console.log(`Current Page: ${tabs[0].url}`)
             if (!tabs[0].url.includes("youtube.com"))
-            {
-                console.log('Not on a youtube page');
-                alert("Switch to a Youtube tab to run");
-                return
-            }
-            
-            chrome.tabs.sendMessage(
-                tabs[0].id, dataToSend, function(response) {
-                    console.log(response) // Data received from front end as JSON
-    
-                    //Display message from front end that data has been received
-                    console.log(response.message)                
-                    var watchData = response.watchData
-                    var _lsTotal = response.total
-                    var watchDataAmt = response.watchDataAmt
-                    console.log("watchDataAmt = " + (watchDataAmt / 1024).toFixed(2) + "KB");
-                    if (watchData === "")
-                        {
-                            watchData = "Total watchData Usage: 0KB"
-                        }
-            
-                    const TotalUsedEle = document.createElement("p");
-                    const watchDataEle = document.createElement("p");
-            
-                    TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
-                    watchDataEle.textContent = watchData
-                    document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
-                    document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
-            
-                    var elem = document.getElementById("myBar");   
-                    var width = 0;
-                    var id = setInterval(frame, 10);
-                    function frame() {
-                        width = (_lsTotal / 1024).toFixed(2) / 5000; 
-                        elem.style.width = width + '%'; 
-                    }
+                {
+                    console.log('Not on a youtube page');
+                    alert("Switch to a Youtube tab to run");
+                    return
                 }
-            )
+            
+            else
+                {
+                    // Run for else block
+                    chrome.tabs.sendMessage(
+                        tabs[0].id, dataToSend, function(response) {
+                            console.log(response) // Data received from front end as JSON
+            
+                            //Display message from front end that data has been received
+                            console.log(response.message)                
+                            var watchData = response.watchData
+                            var _lsTotal = response.total
+                            var watchDataAmt = response.watchDataAmt
+                            console.log("watchDataAmt = " + (watchDataAmt / 1024).toFixed(2) + "KB");
+                            if (watchData === "")
+                                {
+                                    watchData = "Total watchData Usage: 0KB"
+                                }
+                    
+                            const TotalUsedEle = document.createElement("p");
+                            const watchDataEle = document.createElement("p");
+                    
+                            TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
+                            watchDataEle.textContent = watchData
+                            document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
+                            document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
+                    
+                            var elem = document.getElementById("myBar");   
+                            var width = 0;
+                            var id = setInterval(frame, 10);
+                            function frame() {
+                                width = (_lsTotal / 1024).toFixed(2) / 5000; 
+                                elem.style.width = width + '%'; 
+                            }
+                        }
+                    )
+                    // End else block
+                }
+
+
         }
 
         chrome.tabs.query({active: true, currentWindow: true}, tabFunction)
