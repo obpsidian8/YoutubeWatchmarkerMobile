@@ -27,7 +27,8 @@ document.addEventListener("DOMContentLoaded" ,function ()
                     console.log(response.message)                
                     var watchData = response.watchData
                     var _lsTotal = response.total
-                    console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
+                    var watchDataAmt = response.watchDataAmt
+                    console.log("watchDataAmt = " + (watchDataAmt / 1024).toFixed(2) + "KB");
                     if (watchData === "")
                         {
                             watchData = "Total watchData Usage: 0KB"

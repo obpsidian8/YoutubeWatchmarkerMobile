@@ -161,6 +161,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
         {
             console.log(`Received usage  message from content. Details:`);
             var watchData = ""
+            var watchDataAmt = 0
             var _lsTotal = 0,
             _xLen, _x;
             for (_x in localStorage) 
@@ -174,8 +175,8 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                     console.log(_x.substr(0, 50) + " = " + (_xLen / 1024).toFixed(2) + " KB")
                     if (_x.substr(0, 50).includes("watchData"))
                         {
-                            watchData = _x.substr(0, 50) + " Usage: " + (_xLen / 1024).toFixed(2) + "KB"
-                            
+                            watchDataAmt = _xLen
+                            watchData = _x.substr(0, 50) + " Usage: " + (watchDataAmt / 1024).toFixed(2) + "KB"
                         }
             };
             console.log("Total = " + (_lsTotal / 1024).toFixed(2) + "KB");
@@ -183,7 +184,8 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             responseMessage = {
                 message: "Frontend has processed usage request",
                 total : _lsTotal,
-                watchData: watchData
+                watchData: watchData,
+                watchDataAmt: watchDataAmt
             }
             funcResponse(responseMessage);
         }
