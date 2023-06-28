@@ -1,9 +1,11 @@
-document.addEventListener("DOMContentLoaded" ,function ()
+document.addEventListener("DOMContentLoaded" ,fillpage);
+function fillpage()
     {
         console.log("The popup content has been loaded. Querying fronend for usage data.")
+
         // Query frontend for storage usage
 
-        
+        chrome.tabs.query({active: true, currentWindow: true}, tabFunction)
         function tabFunction(tabs)
         {
             dataToSend =  {
@@ -60,10 +62,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
 
         }
 
-        chrome.tabs.query({active: true, currentWindow: true}, tabFunction)
-
-
-
+        // CLEAR WATCH DATA SECTION
         document.getElementById("clearWatchDataBtn").addEventListener("click", clearWatchData);
         function clearWatchData (e) 
         {
@@ -111,12 +110,6 @@ document.addEventListener("DOMContentLoaded" ,function ()
         document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
         function showWatchData () 
         {
-            // Sync data first
-            dataToSend =  {
-                message: "autoFill",
-                type: "syncData" 
-            }
-
             function showWatchtFunct (tabs) 
                 {
                     console.log(`Current Page: ${tabs[0].url}`)
@@ -127,6 +120,11 @@ document.addEventListener("DOMContentLoaded" ,function ()
                         return
                     }
                     
+                    dataToSend =  {
+                        message: "autoFill",
+                        type: "syncData" 
+                    }
+
                     chrome.tabs.sendMessage(
                         tabs[0].id, dataToSend, function(response) {
                             console.log(response) // Data received from front end as JSON
@@ -197,10 +195,6 @@ document.addEventListener("DOMContentLoaded" ,function ()
         document.getElementById("exportWatchDataBtn").addEventListener("click", exportWatchData);
         function exportWatchData ()
         {
-            dataToSend =  {
-                message: "autoFill",
-                type: "syncData" 
-            }
             function exportTabFunc(tabs) 
                         {
                             console.log(`Current Page: ${tabs[0].url}`)
@@ -209,6 +203,11 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                 console.log('Not on a youtube page');
                                 alert("Switch to a Youtube tab to run");
                                 return
+                            }
+
+                            dataToSend =  {
+                                message: "autoFill",
+                                type: "syncData" 
                             }
 
                             chrome.tabs.sendMessage(
@@ -237,7 +236,7 @@ document.addEventListener("DOMContentLoaded" ,function ()
                                     // document.body.appendChild(container);
                                 }
                             )
-                        }
+                }
 
             chrome.tabs.query({active: true, currentWindow: true}, exportTabFunc)
         }
@@ -309,7 +308,4 @@ document.addEventListener("DOMContentLoaded" ,function ()
             chrome.tabs.query({active: true, currentWindow: true}, importTabFunct)
         }
         
-        
     }
-);
-

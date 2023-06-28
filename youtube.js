@@ -143,12 +143,14 @@ chrome.runtime.onMessage.addListener(messageReceivedProcess);
 function messageReceivedProcess (objData, objSender, funcResponse)
     {
         console.log('Message received from background. Processing.');
+        // Case "NEW"
         if (objData.type === "NEW")
             {
                 console.log(`Received message from background that page has changed.`);
                 funcResponse(null);
             }
-
+        
+        // Case "clearWatchData"
         else if (objData.type === "clearWatchData")
             {
                 console.log(`Received clearWatchData  message from content. Details:`);
@@ -156,7 +158,8 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                 window.localStorage.setItem("watchData", JSON.stringify({}));
                 funcResponse(null);
             }
-
+        
+        // Case "usage"
         else if (objData.type === "usage")
         {
             console.log(`Received usage  message from content. Details:`);
@@ -190,6 +193,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             funcResponse(responseMessage);
         }
 
+        // Case "syncData"
         else if (objData.type === "syncData")
         {
             console.log(`Received syncDataBtn  message from content. Sending back watchdata:`);
@@ -197,6 +201,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             funcResponse({"data": vidsWatched});
         }
 
+        // Case "importData"
         else if (objData.type === "importData")
         {
             console.log(`Received importData  message from popup.`);
@@ -218,7 +223,6 @@ function messageReceivedProcess (objData, objSender, funcResponse)
             funcResponse(responseMessage);
         }
         console.log("Done with messageReceivedProcess!")
-        
         return true
     };
 
@@ -234,10 +238,6 @@ function checkPage()
                 console.log(`Checking page for new elements ${checkPageCount}`)
             }
         
-        
-        // if (document.hidden === true) {
-        //     return;
-        // }
         if (document.URL.includes("youtube.com/watch")) 
             {
                 var vidId = document.URL.split('v=')[1].split("#")[0];
@@ -251,12 +251,6 @@ function checkPage()
                 {
                     console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
                 }
-                
-                // if (isNaN(parseFloat(vidDuration))) 
-                //     {
-                //         vidDuration = document.getElementsByClassName('video-stream')[0].duration;
-                //         console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
-                //     };
                 
                 if (isNaN(parseFloat(vidDuration))) 
                     {
