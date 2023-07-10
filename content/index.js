@@ -106,7 +106,7 @@ function fillpage()
                 }
         }
         
-        // EXPORT SHOW DATA SECTION
+        // SHOW DATA SECTION
         document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
         function showWatchData () 
         {
@@ -163,6 +163,7 @@ function fillpage()
 
                                             firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
 
+                                            // This will make sure that the most seen videos (end of the object) will be on the top of the page
                                             if (!firstChildEle)
                                                 {
                                                     document.querySelectorAll('.watchdata_details')[0].appendChild(container);

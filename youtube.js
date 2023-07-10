@@ -322,6 +322,8 @@ function checkPage()
                                 var currentWatchDataObj = window.localStorage.getItem("watchData"); // result is a STRING
                                 currentWatchDataObj = JSON.parse(currentWatchDataObj) //turn to JSON to modify
                                 console.log(details);
+                                // Remove current vid info before adding new vid info
+                                delete currentWatchDataObj[vidId];
                                 currentWatchDataObj[vidId] = details
                                 console.log(`currentWatchDataObj:-`);
                                 console.log(currentWatchDataObj);
