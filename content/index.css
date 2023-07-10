@@ -1,6 +1,6 @@
 body {
   overflow-x: hidden;
-  width: 250px;
+  width: 100%;
   color: var(--color-primary);
   font-size: var(--font-size-primary);
 }
@@ -52,7 +52,7 @@ header img {
 
 .watchDataDiv {
   background: #fff;
-   width: 100%;;
+   width: 100%;
   border: 3px solid green;
   padding: 8px;
   margin: 8px;

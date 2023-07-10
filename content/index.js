@@ -152,8 +152,8 @@ function fillpage()
 
                                             infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
                                             infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
-                                            infoEleVidId.textContent =  "Vid id: " + currentWatchDataObj[property].vidId
-                                            // infoEleVidId.href = "https://m.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
+                                            infoEleVidId.textContent =  "Vid id: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
+                                            // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
                                             container.appendChild(infoEleTitle);
                                             container.appendChild(divider);
