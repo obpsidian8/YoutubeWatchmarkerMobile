@@ -273,9 +273,15 @@ function checkPage()
                             initWatchData() // refresh watch data
                             let watchedVidObject = vidsWatched[vidId]
                             let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
-                            console.log(`Resuming ${vidId} from last location ${latestTimePlayed}`)
-                            document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
-                            currentpage = document.URL
+                            let portionPlayed = (watchedVidObject["timeInfo"]["percentPlayed"])
+                            if (portionPlayed < 0.99)
+                                {
+                                    // Only play from last stop point if vid play has not "finished".
+                                    console.log(`Resuming ${vidId} from last location ${latestTimePlayed}`)
+                                    document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
+                                    currentpage = document.URL
+                                }
+
                         }
 
 
@@ -284,7 +290,7 @@ function checkPage()
                         console.log(`Current vid time for ${document.URL}: ${currentTime}`);
                         var fractionWatched =currentTime/vidDuration;
 
-                        if (fractionWatched >= 0.98)
+                        if (fractionWatched >= 0.999)
                             {
                                 console.log(`Video has finished playing`)
                             }
