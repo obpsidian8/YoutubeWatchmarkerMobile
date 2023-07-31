@@ -70,29 +70,46 @@ function mark (objVideo,percentPlayed, boolMark)
     {
         console.log(`Marking video: ${objVideo.href}`)
         if ((boolMark === true) ) 
-        {
-            objVideo.classList.add('youwatch-mark');
-            objVideo.style = "opacity:0.4";
-
-            try {
-                element = objVideo.querySelector('.yt-core-attributed-string');
-                element.textContent = "seen| " + element.textContent
-              } 
-            catch (err) 
-                {
-                console.log(`Error: ${err}`)
-                }
-
-            createOverlay(objVideo,percentPlayed);
-        } 
+            {
+                addTextMark(objVideo);
+                createOverlay(objVideo,percentPlayed);
+            } 
         
         else if ((boolMark !== true) && (objVideo.classList.contains('youwatch-mark') !== false)) 
-        {
-            objVideo.classList.remove('youwatch-mark');
-            objVideo.style = "opacity:1";
-        }
+            {
+                objVideo.classList.remove('youwatch-mark');
+                objVideo.style = "opacity:1";
+            }
 
     };
+
+
+function addTextMark(objVideo)
+    {
+        objVideo.classList.add('youwatch-mark');
+        objVideo.style = "opacity:0.4";
+
+        try {
+            element = objVideo.querySelector('.yt-core-attributed-string');
+            console.log(element.textContent)
+            if (element.textContent.includes("seen|"))
+                {
+                    console.log("Already marked.")
+                    return
+                }
+            else
+                {
+                    element.textContent = "seen| " + element.textContent;
+                }
+          } 
+        catch (err) 
+            {
+            console.log(`Error: ${err}`)
+            }
+
+    }
+
+
 
 function createOverlay (objVideo, percentPlayed)
     {
@@ -102,10 +119,11 @@ function createOverlay (objVideo, percentPlayed)
 
         console.log(`   `)
         console.log(`About to overlay video: ${objVideo}`);
+
         var targetElement = objVideo.lastChild.lastChild // target element for mobile page
         if (targetElement === null)
             {
-                targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
+                var targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
                 if (targetElement === null)
                     {
                         console.log(`Current element not on page. Moving on`)
@@ -122,17 +140,34 @@ function createOverlay (objVideo, percentPlayed)
 
                 if (objVideoChild)
                     {
-                        console.log(`Overlay already present`)
+                        console.log(`Overlay already present for desktop`)
                         return
                     }
+                else
+                    {
+                        targetElement.appendChild(playbackOverlayElement);
+                        targetElement.insertBefore(targetElement.querySelectorAll('.youwatch-mark')[0], playbackOverlayElement); //Placing target element for desktop page
+                    }
                 // ###################################################################################################
-                
-                targetElement.appendChild(playbackOverlayElement);
-                targetElement.insertBefore(targetElement.querySelectorAll('.youwatch-mark')[0], playbackOverlayElement); //Placing target element for desktop page
             }
         else
             {
-                targetElement.appendChild(playbackOverlayElement); // Placing overlay element for mobile page
+                objVideoChild = null
+                objVideoChildList = targetElement.querySelectorAll('.thumbnail-overlay-resume-playback-progress')
+                if (objVideoChildList)
+                    {
+                        objVideoChild = objVideoChildList[0]
+                    }
+
+                if (objVideoChild)
+                    {
+                        console.log(`Overlay already present for mobile`)
+                        return
+                    }
+                else
+                    {
+                        targetElement.appendChild(playbackOverlayElement); // Placing overlay element for mobile page
+                    }
             }
             
 
@@ -229,7 +264,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 // ###########################################################
 // This will set the interval to update the list of elements on the page and also to send time info to backend. Need to be fast beause you scroll the page quickly
 // Updates data from the page at given interval
-window.setInterval(checkPage, 300);
+window.setInterval(checkPage, 600);
 function checkPage()
     {
         display_every = 20

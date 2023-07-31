@@ -15,12 +15,12 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
                     file: "youtube.css"
                 });
                 
-                // // Inject script into page
-                // chrome.tabs.executeScript(tab.id, {
-                //     "file": "youtube.js"
-                // }, function () {
-                //     console.log("***Script Executed***"); // Notification on Completion
-                // })
+                // Inject script into page
+                chrome.tabs.executeScript(tab.id, {
+                    "file": "youtube.js"
+                }, function () {
+                    console.log("***Script Executed***"); // Notification on Completion
+                })
 
                 var message  =  {
                     "type": "NEW",
