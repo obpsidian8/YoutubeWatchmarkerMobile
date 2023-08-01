@@ -146,6 +146,17 @@ function fillpage()
                                             divider.className = "divider"
                                             const dividerA = divider.cloneNode(true);
 
+                                            const infoEleImageContainer = document.createElement("div")
+                                            infoEleImageContainer.className  = "thumbnail-container"
+                                            const imageElement = document.createElement("img")
+                                            imageElement.alt= ""
+                                            imageElement.className="image-loaded"
+
+                                            imageElement.src = "https://i.ytimg.com/vi/"+currentWatchDataObj[property].vidId+"/mqdefault.jpg"
+
+                                            
+                                            infoEleImageContainer.appendChild(imageElement)
+
                                             const infoEleTitle = document.createElement("span");
                                             const infoElePercentPlayed = document.createElement("span");
                                             const infoEleVidId = document.createElement("span");
@@ -155,6 +166,7 @@ function fillpage()
                                             infoEleVidId.textContent =  "Vid id: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
                                             // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
+                                            container.appendChild(infoEleImageContainer);
                                             container.appendChild(infoEleTitle);
                                             container.appendChild(divider);
                                             container.appendChild(infoElePercentPlayed);

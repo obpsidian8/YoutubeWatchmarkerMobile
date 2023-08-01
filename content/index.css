@@ -17,6 +17,7 @@ span {
   display:block;
   font-family: 'Trebuchet MS';
   align-items: center;
+  max-width:100%;
 }
 
 
@@ -27,7 +28,7 @@ hr.divider {
 
 
 .image,
-header img {
+header{
   height: 1em;
   max-width: 80%;
 }
@@ -60,6 +61,16 @@ header img {
   align-items: center;
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
   
+}
+
+.video-thumbnail-container{
+  align-items: center;
+  width: 100%;
+}
+
+img {
+  width:100%;
+  height: auto;
 }
 
 
