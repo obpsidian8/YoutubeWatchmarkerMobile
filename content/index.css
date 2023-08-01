@@ -5,6 +5,15 @@ body {
   font-size: var(--font-size-primary);
 }
 
+button {
+  border-radius: 4px;
+  text-align: center;
+  display: inline-block;
+  margin: 1px;
+  cursor: pointer;
+}
+
+
 /* Rounded border */
 hr.rounded {
   border-top: 4px solid #bbb;

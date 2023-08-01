@@ -194,7 +194,24 @@ function messageReceivedProcess (objData, objSender, funcResponse)
                 funcResponse(null);
             }
         
-        // Case "usage"
+        // Case "deleteEntry"
+        else if (objData.type === "deleteEntry")
+        {
+            vidId = objData.vidId
+            console.log(`Received deleteData  message from content. Details: vid id ${vidId}`);
+            var currentWatchDataObj = window.localStorage.getItem("watchData"); // result is a STRING
+            currentWatchDataObj = JSON.parse(currentWatchDataObj) //turn to JSON to modify
+
+            //Delete entry specified
+            delete currentWatchDataObj[vidId];
+
+            window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj)); // turn to STRING to set
+
+            funcResponse(null);
+        }
+
+        
+            // Case "usage"
         else if (objData.type === "usage")
         {
             console.log(`Received usage  message from content. Details:`);

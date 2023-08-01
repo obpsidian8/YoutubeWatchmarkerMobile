@@ -146,16 +146,23 @@ function fillpage()
                                             divider.className = "divider"
                                             const dividerA = divider.cloneNode(true);
 
+                                            // Create Delete button for current tile
+                                            const deleteButton = document.createElement("button");
+                                            deleteButton.type = "button";
+                                            deleteButton.className = "delete_button";
+                                            deleteButton.id = currentWatchDataObj[property].vidId
+                                            deleteButton.textContent = "Delete"
+                                            container.appendChild(deleteButton)
+
+                                            // Create image container
                                             const infoEleImageContainer = document.createElement("div")
                                             infoEleImageContainer.className  = "thumbnail-container"
                                             const imageElement = document.createElement("img")
                                             imageElement.alt= ""
                                             imageElement.className="image-loaded"
-
                                             imageElement.src = "https://i.ytimg.com/vi/"+currentWatchDataObj[property].vidId+"/mqdefault.jpg"
-
-                                            
                                             infoEleImageContainer.appendChild(imageElement)
+
 
                                             const infoEleTitle = document.createElement("span");
                                             const infoElePercentPlayed = document.createElement("span");
@@ -185,6 +192,28 @@ function fillpage()
                                                     document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
                                                 }
                                         }
+                                        
+                                        const buttons = document.querySelectorAll('.delete_button')
+                                        buttons.forEach(function(currentBtn)
+                                        {
+                                            currentBtn.addEventListener('click', handleEvent)
+                                          })
+                                        function handleEvent(event)
+                                            {
+                                                dataToSend =  {
+                                                    message: "autoFill",
+                                                    type: "deleteEntry",
+                                                    vidId:  event.target.id
+                                                }
+                                                chrome.tabs.sendMessage(
+                                                    tabs[0].id, dataToSend, function(response) {
+                                                        console.log(`${event.target.id} deleted!`)
+                                                        document.location.reload();
+                                                    
+                                                    }
+                                                )
+                                            }
+                                        
                                 }
 
                             else
