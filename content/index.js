@@ -42,7 +42,7 @@ function fillpage()
                             const TotalUsedEle = document.createElement("p");
                             const watchDataEle = document.createElement("p");
                     
-                            TotalUsedEle.textContent = "Total Local Storage Used (of 5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 50).toFixed(2) + ") %"
+                            TotalUsedEle.textContent = "Total Local Storage Used of 5000KB (5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 5000).toFixed(3) + ") %"
                             watchDataEle.textContent = watchData
                             document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
                             document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
