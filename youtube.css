@@ -28,7 +28,7 @@ ytd-thumbnail-overlay-resume-playback-renderer {
 
 
 .thumbnail-overlay-resume-playback-progress {
-    background-color: #f00; 
+    background-color: rgb(48, 245, 9) !important; 
     height: 4px;
     left: 0;
 }
