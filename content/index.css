@@ -5,12 +5,22 @@ body {
   font-size: var(--font-size-primary);
 }
 
-button {
+.delete_button {
   border-radius: 4px;
   text-align: center;
   display: inline-block;
   margin: 1px;
   cursor: pointer;
+  float: left !important;
+}
+
+.play_button {
+  border-radius: 4px;
+  text-align: center;
+  display: inline-block;
+  margin: 1px;
+  cursor: pointer;
+  float: right !important;
 }
 
 

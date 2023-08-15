@@ -154,6 +154,14 @@ function fillpage()
                                             deleteButton.textContent = "Delete"
                                             container.appendChild(deleteButton)
 
+                                            // Create Play button for current tile
+                                            const playButton = document.createElement("button");
+                                            playButton.type = "button";
+                                            playButton.className = "play_button";
+                                            playButton.id = currentWatchDataObj[property].vidId
+                                            playButton.textContent = "Play"
+                                            container.appendChild(playButton)
+
                                             // Create image container
                                             const infoEleImageContainer = document.createElement("div")
                                             infoEleImageContainer.className  = "thumbnail-container"
@@ -193,12 +201,13 @@ function fillpage()
                                                 }
                                         }
                                         
-                                        const buttons = document.querySelectorAll('.delete_button')
-                                        buttons.forEach(function(currentBtn)
+                                        //============================================================================
+                                        const del_buttons = document.querySelectorAll('.delete_button')
+                                        del_buttons.forEach(function(currentBtn)
                                         {
-                                            currentBtn.addEventListener('click', handleEvent)
+                                            currentBtn.addEventListener('click', handleDelEvent)
                                           })
-                                        function handleEvent(event)
+                                        function handleDelEvent(event)
                                             {
                                                 dataToSend =  {
                                                     message: "autoFill",
@@ -209,10 +218,23 @@ function fillpage()
                                                     tabs[0].id, dataToSend, function(response) {
                                                         console.log(`${event.target.id} deleted!`)
                                                         document.location.reload();
-                                                    
                                                     }
                                                 )
                                             }
+                                        
+                                        //============================================================================
+                                        const play_buttons = document.querySelectorAll('.play_button')
+                                        play_buttons.forEach(function(currentBtn)
+                                        {
+                                            currentBtn.addEventListener('click', handlePlayEvent)
+                                          })
+                                        function handlePlayEvent(event)
+                                            {
+                                                var newURL = "https://www.youtube.com/watch?v="+event.target.id;
+                                                chrome.tabs.create({ url: newURL });
+                                            }
+                                        //============================================================================
+                                        
                                         
                                 }
 
