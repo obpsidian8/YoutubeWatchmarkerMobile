@@ -356,13 +356,15 @@ function checkPage()
                                             "vidUrl": document.URL,
                                             "title": document.title,
                                             "msgType": "vidPlayingInfo",
-                                            "vidId": vidId
+                                            "vidId": vidId, 
+                                            "lastPlayed": new Date().toJSON().slice(0, 10),
                                         }
 
                                 // Save data to localStorage from frontend
                                 percentPlayed = message.timeInfo.currentTime/message.timeInfo.totalDuration
                                 var details = { 
                                             "vidId": vidId,
+                                            "lastPlayed": message.lastPlayed,
                                             "vidUrl": message.vidUrl,
                                             "title": message.title,
                                             "timeInfo": {  "currentTime":message.timeInfo.currentTime, 

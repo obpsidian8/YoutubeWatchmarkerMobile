@@ -145,6 +145,7 @@ function fillpage()
                                             const divider = document.createElement("hr")
                                             divider.className = "divider"
                                             const dividerA = divider.cloneNode(true);
+                                            const dividerB = divider.cloneNode(true);
 
                                             // Create Delete button for current tile
                                             const deleteButton = document.createElement("button");
@@ -175,10 +176,12 @@ function fillpage()
                                             const infoEleTitle = document.createElement("span");
                                             const infoElePercentPlayed = document.createElement("span");
                                             const infoEleVidId = document.createElement("span");
+                                            const infoLastPlayed = document.createElement("span");
 
                                             infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
                                             infoElePercentPlayed.textContent = "Played: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
                                             infoEleVidId.textContent =  "Vid id: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
+                                            infoLastPlayed.textContent = "Date Last Played: "+`${currentWatchDataObj[property].lastPlayed}`
                                             // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
                                             container.appendChild(infoEleImageContainer);
@@ -187,6 +190,8 @@ function fillpage()
                                             container.appendChild(infoElePercentPlayed);
                                             container.appendChild(dividerA);
                                             container.appendChild(infoEleVidId);
+                                            container.appendChild(dividerB);
+                                            container.appendChild(infoLastPlayed)
 
                                             firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
 
