@@ -350,6 +350,7 @@ function checkPage()
                         // else
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
+                                var dateValue = new Date().toJSON().slice(0, 10)
                                 message = { "timeInfo": {  "currentTime":currentTime, 
                                                         "totalDuration": vidDuration, 
                                                         },
@@ -357,7 +358,7 @@ function checkPage()
                                             "title": document.title,
                                             "msgType": "vidPlayingInfo",
                                             "vidId": vidId, 
-                                            "lastPlayed": new Date().toJSON().slice(0, 10),
+                                            "lastPlayed":dateValue ,
                                         }
 
                                 // Save data to localStorage from frontend
