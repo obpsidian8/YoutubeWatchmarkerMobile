@@ -350,7 +350,7 @@ function checkPage()
                         // else
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
-                                var dateValue = new Date().toJSON().slice(0, 10)
+                                var dateValue = new Date().toDateString()
                                 message = { "timeInfo": {  "currentTime":currentTime, 
                                                         "totalDuration": vidDuration, 
                                                         },
