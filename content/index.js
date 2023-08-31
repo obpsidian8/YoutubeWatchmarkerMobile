@@ -178,7 +178,7 @@ function fillpage()
                                             const infoEleVidId = document.createElement("span");
                                             const infoLastPlayed = document.createElement("span");
 
-                                            infoEleTitle.textContent = "Title: "+currentWatchDataObj[property].title
+                                            infoEleTitle.textContent = ""+currentWatchDataObj[property].title
                                             infoElePercentPlayed.textContent = "Progress: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
                                             infoEleVidId.textContent =  "Url: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
                                             infoLastPlayed.textContent = "Viewed on: "+`${currentWatchDataObj[property].lastPlayed}`
@@ -188,8 +188,8 @@ function fillpage()
                                             container.appendChild(infoEleTitle);
                                             container.appendChild(divider);
                                             container.appendChild(infoElePercentPlayed);
-                                            container.appendChild(dividerA);
-                                            container.appendChild(infoEleVidId);
+                                            //container.appendChild(dividerA);
+                                            //container.appendChild(infoEleVidId);
                                             container.appendChild(dividerB);
                                             container.appendChild(infoLastPlayed)
 
