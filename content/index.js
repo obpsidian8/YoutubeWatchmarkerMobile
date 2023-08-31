@@ -42,7 +42,7 @@ function fillpage()
                             const TotalUsedEle = document.createElement("p");
                             const watchDataEle = document.createElement("p");
                     
-                            TotalUsedEle.textContent = "Total Local Storage Used of 5000KB (5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 5000).toFixed(3) + ") %"
+                            TotalUsedEle.textContent = "Total Local Storage Used of 5000KB (5MB): " + (_lsTotal / 1024).toFixed(2) + "KB (" + ((_lsTotal / 1024)/ 5000).toFixed(3) + "%)"
                             watchDataEle.textContent = watchData
                             document.querySelectorAll('.stats-total')[0].appendChild(TotalUsedEle);
                             document.querySelectorAll('.stats-total')[0].appendChild(watchDataEle);
@@ -136,9 +136,11 @@ function fillpage()
                                     watchdata_details_ele.style.display = "block";
                                     // Get details of watchData
                                     var currentWatchDataObj = response.data;
+                                    var num = 0
                                     // currentWatchDataObj = JSON.parse(currentWatchDataObj);
                                     for (property in currentWatchDataObj)
                                         {
+                                            num = num +1;
                                             const container = document.createElement("div");
                                             container.className = "watchDataDiv"
 
@@ -185,6 +187,7 @@ function fillpage()
                                             // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
                                             container.appendChild(infoEleImageContainer);
+                                            container.appendChild(dividerA);
                                             container.appendChild(infoEleTitle);
                                             container.appendChild(divider);
                                             container.appendChild(infoElePercentPlayed);
@@ -207,6 +210,7 @@ function fillpage()
                                         }
                                         
                                         //============================================================================
+                                        // ADD EVENT LISTENERS FOR ALL DELETE BUTTONS FOR TILES
                                         const del_buttons = document.querySelectorAll('.delete_button')
                                         del_buttons.forEach(function(currentBtn)
                                         {
@@ -228,6 +232,7 @@ function fillpage()
                                             }
                                         
                                         //============================================================================
+                                        // ADD EVENT LISTENERS FOR ALL THE PLAY BUTTONS FOR TILES
                                         const play_buttons = document.querySelectorAll('.play_button')
                                         play_buttons.forEach(function(currentBtn)
                                         {
@@ -238,7 +243,12 @@ function fillpage()
                                                 var newURL = "https://www.youtube.com/watch?v="+event.target.id;
                                                 chrome.tabs.create({ url: newURL });
                                             }
+                                        
                                         //============================================================================
+                                        // ADD VID COUNT TO BANNER
+                                        const vidCountElement = document.createElement("p");
+                                        vidCountElement.textContent = "Vid Count:"+num
+                                        document.querySelectorAll('.stats-total')[0].appendChild(vidCountElement)
                                         
                                         
                                 }
