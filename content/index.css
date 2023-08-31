@@ -6,6 +6,7 @@ body {
 }
 
 .delete_button {
+  background-color: #a42e2ec7;
   border-radius: 4px;
   text-align: center;
   display: inline-block;
@@ -15,6 +16,7 @@ body {
 }
 
 .play_button {
+  background-color: #2ea44fa4;
   border-radius: 4px;
   text-align: center;
   display: inline-block;
@@ -34,9 +36,9 @@ hr.rounded {
 p,
 span {
   display:block;
-  font-family: 'Trebuchet MS';
+  font-family: verdana, 'open sans', sans-serif;
+  font-weight: bold; 
   align-items: center;
-  max-width:100%;
 }
 
 
@@ -73,7 +75,7 @@ header{
 .watchDataDiv {
   background: #fff;
    width: 100%;
-  border: 3px solid green;
+  border: 3px solid rgba(0, 128, 0, 0.397);
   padding: 8px;
   margin: 8px;
   border-radius: 8px;
@@ -82,12 +84,13 @@ header{
   
 }
 
-.video-thumbnail-container{
+.thumbnail-container{
   align-items: center;
   width: 100%;
 }
 
 img {
+  border-radius: 8px;
   width:100%;
   height: auto;
 }
@@ -114,6 +117,7 @@ img {
 .importDataBtn,
 .syncDataBtn,
 .clearBtn {
+  width:100%;
   align-items: center;
   display: flex;
   justify-content: center;
@@ -141,12 +145,12 @@ img {
     text-align: center;
     font-size: 20px;
     align-items: center;
-    font-family: Verdana;
+    font-family: verdana, 'open sans', sans-serif;
 }
 
   /* CSS */
   .button-3 {
-    
+    width:100%;
     background-color: #2ea44f;
     border: 1px solid rgba(27, 31, 35, .15);
     border-radius: 6px;
@@ -155,7 +159,7 @@ img {
     color: #fff;
     cursor: pointer;
     font-family: verdana, 'open sans', sans-serif;
-    font-size: 14px;
+    font-size: auto;
     font-weight: 600;
     line-height: 20px;
     padding: 6px 16px;
