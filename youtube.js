@@ -92,14 +92,14 @@ function addTextMark(objVideo)
         try {
             element = objVideo.querySelector('.yt-core-attributed-string');
             console.log(element.textContent)
-            if (element.textContent.includes("seen|"))
+            if (element.textContent.includes("seen*"))
                 {
                     console.log("Already marked.")
                     return
                 }
             else
                 {
-                    element.textContent = "seen| " + element.textContent;
+                    element.textContent = "seen* " + element.textContent;
                 }
           } 
         catch (err) 
