@@ -334,14 +334,13 @@ function checkPage()
                                     video.currentTime = latestTimePlayed
                                     currentpage = document.URL
                                 }
-
                         }
 
 
                         // console.log(`Getting current position for video: ${document.URL}`)
                         currentTime = video.currentTime;
                         console.log(`Current vid time for ${document.URL}: ${currentTime}`);
-                        var fractionWatched =currentTime/vidDuration;
+                        var fractionWatched = currentTime/vidDuration;
 
                         if (fractionWatched >= 0.999)
                             {
