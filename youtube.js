@@ -281,10 +281,10 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 // ###########################################################
 // This will set the interval to update the list of elements on the page and also to send time info to backend. Need to be fast beause you scroll the page quickly
 // Updates data from the page at given interval
-window.setInterval(checkPage, 600);
+window.setInterval(checkPage, 1000);
 function checkPage()
     {
-        display_every = 20
+        display_every = 30
         if (checkPageCount % display_every === 0)
             {
                 console.log(`Checking page for new elements ${checkPageCount}`)
@@ -292,13 +292,14 @@ function checkPage()
         
         if (document.URL.includes("youtube.com/watch")) 
             {
+                var video = document.getElementsByClassName('video-stream')[0]
                 var vidId = document.URL.split('v=')[1].split("#")[0];
                 if (vidId.includes("&"))
                 {
                     vidId = vidId.split("&")[0]
                 }
 
-                vidDuration = document.getElementsByClassName('video-stream')[0].duration;
+                vidDuration = video.duration;
                 if (checkPageCount % display_every === 0)
                 {
                     console.log(`Total time for video: ${document.URL}: ${vidDuration}`);
@@ -324,13 +325,13 @@ function checkPage()
                             // Start the video from last played time
                             initWatchData() // refresh watch data
                             let watchedVidObject = vidsWatched[vidId]
-                            let latestTimePlayed = Math.floor(watchedVidObject["timeInfo"]["currentTime"])
+                            let latestTimePlayed = (watchedVidObject["timeInfo"]["currentTime"])+0.001
                             let portionPlayed = (watchedVidObject["timeInfo"]["percentPlayed"])
                             if (portionPlayed < 0.99)
                                 {
                                     // Only play from last stop point if vid play has not "finished".
                                     console.log(`Resuming ${vidId} from last location ${latestTimePlayed}`)
-                                    document.getElementsByClassName('video-stream')[0].currentTime = latestTimePlayed
+                                    video.currentTime = latestTimePlayed
                                     currentpage = document.URL
                                 }
 
@@ -338,7 +339,7 @@ function checkPage()
 
 
                         // console.log(`Getting current position for video: ${document.URL}`)
-                        currentTime = document.getElementsByClassName('video-stream')[0].currentTime;
+                        currentTime = video.currentTime;
                         console.log(`Current vid time for ${document.URL}: ${currentTime}`);
                         var fractionWatched =currentTime/vidDuration;
 
@@ -347,7 +348,6 @@ function checkPage()
                                 console.log(`Video has finished playing`)
                             }
                         else if ((vidDuration<120 && fractionWatched >0.5 )  || (vidDuration>120 && currentTime >60) )
-                        // else
                             {
                                 console.log(`Enough time has passed for vid! video will be stored`)
                                 var dateValue = new Date().toDateString()
@@ -396,7 +396,6 @@ function checkPage()
         }
 
         strLastchange = window.location.href + ':' + window.document.title + ':' + objVideocache.length + ':' + objProgresscache.length;
-        // console.log(`strLastchange: ${strLastchange}`)
         refresh();
         
     };

@@ -4,9 +4,8 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
     {
         console.log(`....................................................................`)
         console.log(`*UPDATE EVENT FIRED! URL: ${tab.url}, Tab id: ${tab.id}`)
-        console.log(tabId)
-        console.log(changeInfo)
-        console.log(changeInfo.status)
+        console.log(`changeInfo: ${JSON. stringify(changeInfo)}`)
+        console.log(`changeInfo.status: ${changeInfo.status}`)
         if (tab.url && tab.url.includes("youtube.com"))
             {
                 //Inject css into page
@@ -19,7 +18,7 @@ function tabsUpdatedProcess (tabId,changeInfo, tab)
                 chrome.tabs.executeScript(tab.id, {
                     "file": "youtube.js"
                 }, function () {
-                    console.log("***Script Executed***"); // Notification on Completion
+                    console.log("***Main Script Executed***"); // Notification on Completion
                 })
 
                 var message  =  {
