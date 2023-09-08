@@ -17,7 +17,7 @@ var currentpage = null;
 function initWatchData ()
     {
         // Data will be refreshed each time the page is loaded
-        console.log(`Loading watchData via content script`)
+        // console.log(`Loading watchData via content script`)
         vidsWatched = window.localStorage.getItem("watchData"); //getting a STRING
         if (!vidsWatched)
             {
@@ -281,10 +281,10 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 // ###########################################################
 // This will set the interval to update the list of elements on the page and also to send time info to backend. Need to be fast beause you scroll the page quickly
 // Updates data from the page at given interval
-window.setInterval(checkPage, 1000);
+window.setInterval(checkPage, 100);
 function checkPage()
     {
-        display_every = 30
+        display_every = 90
         if (checkPageCount % display_every === 0)
             {
                 console.log(`Checking page for new elements ${checkPageCount}`)
@@ -379,8 +379,8 @@ function checkPage()
                                 // Remove current vid info before adding new vid info
                                 delete currentWatchDataObj[vidId];
                                 currentWatchDataObj[vidId] = details
-                                console.log(`currentWatchDataObj:-`);
-                                console.log(currentWatchDataObj);
+                                // console.log(`currentWatchDataObj:-`);
+                                // console.log(currentWatchDataObj);
                                 window.localStorage.setItem("watchData", JSON.stringify(currentWatchDataObj)); // turn to STRING to set
                             }
                     }
