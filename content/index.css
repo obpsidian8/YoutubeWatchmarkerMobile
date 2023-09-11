@@ -6,6 +6,20 @@ body {
   font-size: var(--font-size-primary);
 }
 
+ytm-thumbnail-overlay-resume-playback-renderer {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background-color: #909090;
+  border-radius: 30px;
+}
+
+.thumbnail-overlay-resume-playback-progress {
+  background-color: rgb(48, 245, 9) !important; 
+  height: 4px;
+  left: 0;
+}
+
 .delete_button {
   background-color: #a42e2ec7;
   border-radius: 4px;

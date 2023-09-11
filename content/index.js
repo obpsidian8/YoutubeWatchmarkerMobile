@@ -186,7 +186,17 @@ function fillpage()
                                             infoLastPlayed.textContent = "Viewed on: "+`${currentWatchDataObj[property].lastPlayed}`
                                             // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
+                                            //Create progress bar
+                                            const progressBarContainer = document.createElement("div");
+                                            progressBarContainer.className = "ytm-thumbnail-overlay-resume-playback-renderer"
+                                            const progress = document.createElement("div")
+                                            progress.className = "thumbnail-overlay-resume-playback-progress"
+                                            progress.style= "width: "+Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%"
+                                            progressBarContainer.appendChild(progress)
+
+
                                             container.appendChild(infoEleImageContainer);
+                                            container.append(progressBarContainer)
                                             container.appendChild(dividerA);
                                             container.appendChild(infoEleTitle);
                                             container.appendChild(divider);
