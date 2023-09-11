@@ -12,7 +12,7 @@
    },
    "content_scripts": [ {
       "css": [ "youtube.css" ],
-      "js": ["youtube.js"],
+      
       "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ]
    } ],
    "description": "Automatically mark videos on Youtube mobile and desktop that you have already watched.",
