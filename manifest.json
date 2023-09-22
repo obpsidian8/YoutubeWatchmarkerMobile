@@ -5,7 +5,7 @@
    "browser_action": {
       "browser_style": false,
       "default_icon": {
-         "128": "content/icon.png"
+         "150": "content/icon.png"
       },
       "default_title": "Watchmarker Mobile",
       "default_popup": "/content/index.html"
