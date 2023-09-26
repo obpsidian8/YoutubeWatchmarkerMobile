@@ -281,7 +281,7 @@ function messageReceivedProcess (objData, objSender, funcResponse)
 // ###########################################################
 // This will set the interval to update the list of elements on the page and also to send time info to backend. Need to be fast beause you scroll the page quickly
 // Updates data from the page at given interval
-window.setInterval(checkPage, 1000);
+window.setInterval(checkPage, 800);
 function checkPage()
     {
         display_every = 90
