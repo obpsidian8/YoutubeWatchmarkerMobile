@@ -3,6 +3,7 @@ body {
   width: 100%;
   min-width: 20em; 
   color: var(--color-primary);
+  background-color: 	#C8C8C8;
   font-size: var(--font-size-primary);
 }
 
@@ -23,7 +24,7 @@ ytm-thumbnail-overlay-resume-playback-renderer {
 }
 
 .delete_button {
-  background-color: #a42e2ec7;
+  background-color: #ee0f0fc7;
   border-radius: 4px;
   text-align: center;
   display: inline-block;
@@ -53,7 +54,7 @@ hr.rounded {
 p,
 span {
   display:block;
-  font-family: verdana, 'open sans', sans-serif;
+  font-family: system-ui;
   font-weight: bold; 
   align-items: center;
 }
@@ -80,7 +81,7 @@ header{
   flex-grow: 1;
   font-size:  0.8em;
   text-align: center;
-  font-family: verdana, 'open sans', sans-serif;
+  font-family: system-ui;
   color: var(--color-dimmed);
   font-weight: bold; 
   position: center;
@@ -90,7 +91,7 @@ header{
 
 
 .watchDataDiv {
-  background: #fff;
+  background: #d4d0d0;
    width: 100%;
   border: 3px solid rgba(0, 128, 0, 0.39);
   padding: 8px;
@@ -118,7 +119,7 @@ img {
   flex-grow: 1;
   font-size:  0.8em;
   text-align: left;
-  font-family: verdana, 'open sans', sans-serif;
+  font-family: system-ui;
   color: var(--color-dimmed);
   display: none;
   border-radius: 6px;
@@ -163,7 +164,7 @@ img {
     text-align: center;
     font-size: 20px;
     align-items: center;
-    font-family: verdana, 'open sans', sans-serif;
+    font-family: system-ui;
 }
 
   /* CSS */
@@ -176,7 +177,7 @@ img {
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
-    font-family: verdana, 'open sans', sans-serif;
+    font-family: system-ui;
     font-size: auto;
     font-weight: 600;
     line-height: 20px;
