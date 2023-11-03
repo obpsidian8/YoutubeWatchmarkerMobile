@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Product Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
+}
+
 body {
   overflow-x: hidden;
   width: 100%;
@@ -54,7 +61,7 @@ hr.rounded {
 p,
 span {
   display:block;
-  font-family: system-ui;
+  font-family: Product Sans;
   font-weight: bold; 
   align-items: center;
 }
@@ -81,7 +88,7 @@ header{
   flex-grow: 1;
   font-size:  0.8em;
   text-align: center;
-  font-family: system-ui;
+  font-family: Product Sans;
   color: var(--color-dimmed);
   font-weight: bold; 
   position: center;
@@ -119,7 +126,7 @@ img {
   flex-grow: 1;
   font-size:  0.8em;
   text-align: left;
-  font-family: system-ui;
+  font-family: Product Sans;
   color: var(--color-dimmed);
   display: none;
   border-radius: 6px;
@@ -164,7 +171,7 @@ img {
     text-align: center;
     font-size: 20px;
     align-items: center;
-    font-family: system-ui;
+    font-family: Product Sans;
 }
 
   /* CSS */
@@ -177,7 +184,7 @@ img {
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
-    font-family: system-ui;
+    font-family: Product Sans;
     font-size: auto;
     font-weight: 600;
     line-height: 20px;

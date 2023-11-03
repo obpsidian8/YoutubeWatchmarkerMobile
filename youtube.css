@@ -31,6 +31,7 @@ ytd-thumbnail-overlay-resume-playback-renderer {
     background-color: rgb(48, 245, 9) !important; 
     height: 4px;
     left: 0;
+    clear:left
 }
 
 

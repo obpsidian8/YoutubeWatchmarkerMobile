@@ -125,6 +125,11 @@ function createOverlay (objVideo, percentPlayed)
             {
                 var targetElement = objVideo.closest('.style-scope.ytd-rich-grid-media'); // target element for desktop page
                 if (targetElement === null)
+                {
+                    var targetElement = objVideo.closest('.style-scope.ytd-playlist-video-renderer');// alternate target element for desktop page
+                }
+
+                if (targetElement === null)
                     {
                         console.log(`Current element not on page. Moving on`)
                         return
