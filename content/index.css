@@ -35,7 +35,7 @@ ytm-thumbnail-overlay-resume-playback-renderer {
   font-family: 'Product Sans';
   border-radius: 10px;
   text-align: center;
-  display: inline-block;
+  display:none;
   margin: 1px;
   cursor: pointer;
   float: left !important;
@@ -46,7 +46,7 @@ ytm-thumbnail-overlay-resume-playback-renderer {
   font-family: 'Product Sans';
   border-radius: 10px;
   text-align: center;
-  display: inline-block;
+  display: none;
   margin: 1px;
   cursor: pointer;
   float: right !important;
@@ -111,6 +111,17 @@ header{
   
 }
 
+.watchDataDiv:hover {
+  background: rgba(0, 0, 0, 0.2);
+  display: inline-block;
+}
+
+.watchDataDiv:hover .play_button{
+  display: inline-block;
+
+}.watchDataDiv:hover .delete_button{
+  display: inline-block;
+}
 
 .thumbnail-container{
   align-items: center;
@@ -135,9 +146,7 @@ img {
   align-items: center;
 }
 
-.watchDataDiv:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
+
 
 
 .showDataBtn,

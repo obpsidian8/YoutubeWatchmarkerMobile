@@ -157,7 +157,7 @@ function fillpage()
                                             deleteButton.type = "button";
                                             deleteButton.className = "delete_button";
                                             deleteButton.id = currentWatchDataObj[property].vidId
-                                            deleteButton.textContent = "Delete"
+                                            deleteButton.textContent = "X"
                                             container.appendChild(deleteButton)
 
                                             // Create Play button for current tile
@@ -165,7 +165,7 @@ function fillpage()
                                             playButton.type = "button";
                                             playButton.className = "play_button";
                                             playButton.id = currentWatchDataObj[property].vidId
-                                            playButton.textContent = "Play"
+                                            playButton.textContent = "►"
                                             container.appendChild(playButton)
 
                                             // Create image container
