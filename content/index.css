@@ -150,8 +150,6 @@ img {
 
 
 
-
-.showDataBtn,
 .exportDataBtn,
 .importDataBtn,
 .syncDataBtn,
@@ -190,7 +188,7 @@ img {
   /* CSS */
   .button-3 {
     width:100%;
-    background-color: #2ea44f;
+    background-color: #3ed669;
     border: 1px solid rgba(27, 31, 35, .15);
     border-radius: 12px;
     box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
@@ -199,7 +197,7 @@ img {
     cursor: pointer;
     font-family: Product Sans;
     font-size: auto;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 20px;
     padding: 6px 16px;
     position: center;
@@ -207,22 +205,6 @@ img {
     text-decoration: none;
   }
   
-  .button-2 {
-    background-color: #7deb9c;
-    border: 1px solid rgba(27, 31, 35, .15);
-    border-radius: 12px;
-    box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-    box-sizing: border-box;
-    color: #fff;
-    cursor: pointer;
-    font-family: Product Sans;
-    font-size: auto;
-    line-height: 20px;
-    padding: 6px 16px;
-    position: center;
-    text-align: center;
-    text-decoration: none;
-  }
   
   .button-3:focus:not(:focus-visible):not(.focus-visible) {
     box-shadow: none;

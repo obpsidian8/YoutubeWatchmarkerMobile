@@ -110,8 +110,9 @@ function fillpage()
         }
         
         // SHOW DATA SECTION
-        document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
-        function showWatchData () 
+        // document.getElementById("showWatchDataBtn").addEventListener("click", showWatchData);
+        document.getElementById("showWatchDataBtn").addEventListener("click", () => { showWatchData("YouTube");});
+        function showWatchData (query) 
         {
             function showWatchtFunct (tabs) 
                 {
@@ -143,83 +144,87 @@ function fillpage()
                                     // currentWatchDataObj = JSON.parse(currentWatchDataObj);
                                     for (property in currentWatchDataObj)
                                         {
-                                            num = num +1;
-                                            const container = document.createElement("div");
-                                            container.className = "watchDataDiv"
+                                            if (currentWatchDataObj[property].title.toLowerCase().includes(query.toLowerCase()))
+                                            {
+                                                num = num +1;
+                                                const container = document.createElement("div");
+                                                container.className = "watchDataDiv"
 
-                                            const divider = document.createElement("hr")
-                                            divider.className = "divider"
-                                            const dividerA = divider.cloneNode(true);
-                                            const dividerB = divider.cloneNode(true);
+                                                const divider = document.createElement("hr")
+                                                divider.className = "divider"
+                                                const dividerA = divider.cloneNode(true);
+                                                const dividerB = divider.cloneNode(true);
 
-                                            // Create Delete button for current tile
-                                            const deleteButton = document.createElement("button");
-                                            deleteButton.type = "button";
-                                            deleteButton.className = "delete_button";
-                                            deleteButton.id = currentWatchDataObj[property].vidId
-                                            deleteButton.textContent = "X"
-                                            container.appendChild(deleteButton)
+                                                // Create Delete button for current tile
+                                                const deleteButton = document.createElement("button");
+                                                deleteButton.type = "button";
+                                                deleteButton.className = "delete_button";
+                                                deleteButton.id = currentWatchDataObj[property].vidId
+                                                deleteButton.textContent = "X"
+                                                container.appendChild(deleteButton)
 
-                                            // Create Play button for current tile
-                                            const playButton = document.createElement("button");
-                                            playButton.type = "button";
-                                            playButton.className = "play_button";
-                                            playButton.id = currentWatchDataObj[property].vidId
-                                            playButton.textContent = "►"
-                                            container.appendChild(playButton)
+                                                // Create Play button for current tile
+                                                const playButton = document.createElement("button");
+                                                playButton.type = "button";
+                                                playButton.className = "play_button";
+                                                playButton.id = currentWatchDataObj[property].vidId
+                                                playButton.textContent = "►"
+                                                container.appendChild(playButton)
 
-                                            // Create image container
-                                            const infoEleImageContainer = document.createElement("div")
-                                            infoEleImageContainer.className  = "thumbnail-container"
-                                            const imageElement = document.createElement("img")
-                                            imageElement.alt= ""
-                                            imageElement.className="image-loaded"
-                                            imageElement.src = "https://i.ytimg.com/vi/"+currentWatchDataObj[property].vidId+"/mqdefault.jpg"
-                                            infoEleImageContainer.appendChild(imageElement)
-
-
-                                            const infoEleTitle = document.createElement("span");
-                                            const infoElePercentPlayed = document.createElement("span");
-                                            const infoEleVidId = document.createElement("span");
-                                            const infoLastPlayed = document.createElement("span");
-
-                                            infoEleTitle.textContent = ""+currentWatchDataObj[property].title
-                                            infoElePercentPlayed.textContent = "Progress: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
-                                            infoEleVidId.textContent =  "Url: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
-                                            infoLastPlayed.textContent = "Viewed on: "+`${currentWatchDataObj[property].lastPlayed}`
-                                            // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
-
-                                            //Create progress bar
-                                            const progressBarContainer = document.createElement("div");
-                                            progressBarContainer.className = "ytm-thumbnail-overlay-resume-playback-renderer"
-                                            const progress = document.createElement("div")
-                                            progress.className = "thumbnail-overlay-resume-playback-progress"
-                                            progress.style= "width: "+Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%"
-                                            progressBarContainer.appendChild(progress)
+                                                // Create image container
+                                                const infoEleImageContainer = document.createElement("div")
+                                                infoEleImageContainer.className  = "thumbnail-container"
+                                                const imageElement = document.createElement("img")
+                                                imageElement.alt= ""
+                                                imageElement.className="image-loaded"
+                                                imageElement.src = "https://i.ytimg.com/vi/"+currentWatchDataObj[property].vidId+"/mqdefault.jpg"
+                                                infoEleImageContainer.appendChild(imageElement)
 
 
-                                            container.appendChild(infoEleImageContainer);
-                                            container.append(progressBarContainer)
-                                            container.appendChild(dividerA);
-                                            container.appendChild(infoEleTitle);
-                                            container.appendChild(divider);
-                                            container.appendChild(infoElePercentPlayed);
-                                            //container.appendChild(dividerA);
-                                            //container.appendChild(infoEleVidId);
-                                            container.appendChild(dividerB);
-                                            container.appendChild(infoLastPlayed)
+                                                const infoEleTitle = document.createElement("span");
+                                                const infoElePercentPlayed = document.createElement("span");
+                                                const infoEleVidId = document.createElement("span");
+                                                const infoLastPlayed = document.createElement("span");
 
-                                            firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
+                                                infoEleTitle.textContent = ""+currentWatchDataObj[property].title
+                                                infoElePercentPlayed.textContent = "Progress: " + Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%" + " (" + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)/60) + " min " + Math.floor((currentWatchDataObj[property].timeInfo.currentTime)%60) + " s)"
+                                                infoEleVidId.textContent =  "Url: " +"https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId
+                                                infoLastPlayed.textContent = "Viewed on: "+`${currentWatchDataObj[property].lastPlayed}`
+                                                // infoEleVidId.href = "https://www.youtube.com/watch?v=" + currentWatchDataObj[property].vidId;
 
-                                            // This will make sure that the most seen videos (end of the object) will be on the top of the page
-                                            if (!firstChildEle)
-                                                {
-                                                    document.querySelectorAll('.watchdata_details')[0].appendChild(container);
-                                                }
-                                            else
-                                                {
-                                                    document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
-                                                }
+                                                //Create progress bar
+                                                const progressBarContainer = document.createElement("div");
+                                                progressBarContainer.className = "ytm-thumbnail-overlay-resume-playback-renderer"
+                                                const progress = document.createElement("div")
+                                                progress.className = "thumbnail-overlay-resume-playback-progress"
+                                                progress.style= "width: "+Math.floor(((currentWatchDataObj[property].timeInfo.percentPlayed))*100) +"%"
+                                                progressBarContainer.appendChild(progress)
+
+
+                                                container.appendChild(infoEleImageContainer);
+                                                container.append(progressBarContainer)
+                                                container.appendChild(dividerA);
+                                                container.appendChild(infoEleTitle);
+                                                container.appendChild(divider);
+                                                container.appendChild(infoElePercentPlayed);
+                                                //container.appendChild(dividerA);
+                                                //container.appendChild(infoEleVidId);
+                                                container.appendChild(dividerB);
+                                                container.appendChild(infoLastPlayed)
+
+                                                firstChildEle = document.querySelectorAll('.watchdata_details')[0].firstElementChild;
+
+                                                // This will make sure that the most seen videos (end of the object) will be on the top of the page
+                                                if (!firstChildEle)
+                                                    {
+                                                        document.querySelectorAll('.watchdata_details')[0].appendChild(container);
+                                                    }
+                                                else
+                                                    {
+                                                        document.querySelectorAll('.watchdata_details')[0].insertBefore(container, firstChildEle)
+                                                    }
+
+                                            }
                                         }
                                         
                                         //============================================================================
@@ -259,9 +264,16 @@ function fillpage()
                                         
                                         //============================================================================
                                         // ADD VID COUNT TO BANNER
+                                        const vidCountElementContainer = document.createElement("div");
+                                        vidCountElementContainer.className = "vidCountElementContainer"
+
                                         const vidCountElement = document.createElement("p");
                                         vidCountElement.textContent = "Vid Count:"+num
-                                        document.querySelectorAll('.stats-total')[0].appendChild(vidCountElement)
+
+                                        vidCountElementContainer.appendChild(vidCountElement)
+                                        document.querySelectorAll('.stats-total')[0].appendChild(vidCountElementContainer)
+
+                                        document.getElementById("showWatchDataBtn").textContent = "Hide Watch Data"
                                         
                                         
                                 }
@@ -400,7 +412,6 @@ function fillpage()
             chrome.tabs.query({active: true, currentWindow: true}, importTabFunct)
         }
 
-
         //More button to toggle display
         document.getElementById("moreOptions").addEventListener("click", toggleDisplay);
         function  toggleDisplay ()
@@ -408,12 +419,44 @@ function fillpage()
             if (  document.getElementsByClassName("moreSection")[0].style.display==="none")
             {
                 document.getElementsByClassName("moreSection")[0].style.display = "block";
+                document.getElementById("moreOptions").textContent = "Hide Options"
             }
             else
             {
                 document.getElementsByClassName("moreSection")[0].style.display = "none";
+                document.getElementById("moreOptions").textContent = "More Options"
             }
             
 
         }
+
+        //Search
+        document.getElementById('button-addon3').addEventListener("click", searchExplore);
+        function searchExplore(){
+            var input = document.getElementById('searchbar').value;
+            console.log("Search value: "+input)
+
+
+            //Reset prior results
+            var watchdata_details_ele = document.getElementById("watchdata_details");
+            if (watchdata_details_ele.style.display != "none" &&  watchdata_details_ele.style.display != "")
+                {
+                    watchdata_details_ele.style.display = "none";
+                    while (watchdata_details_ele.hasChildNodes()) {
+                        watchdata_details_ele.removeChild(watchdata_details_ele.lastChild)
+                      }
+                }
+
+            
+            try {
+                // Reset vid counter
+                document.getElementsByClassName("vidCountElementContainer")[0].remove()
+                }
+            catch(err) {
+                console.log(err.message)
+                }
+
+            // console.log("Search page")
+            showWatchData(input);
+           }
     }

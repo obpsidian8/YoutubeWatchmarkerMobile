@@ -23,6 +23,6 @@
    "manifest_version": 2,
    "name": "Watchmarker Mobile",
    "permissions": [ "alarms","storage", "downloads", "history", "tabs", "cookies", "webRequest", "webRequestBlocking", "*://www.youtube.com/*", "*://*.ytimg.com/vi/*/*", "*://m.youtube.com/*"],
-   "version": "2.0"
+   "version": "2.1"
 }
 

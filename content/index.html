@@ -36,23 +36,27 @@
         
         
         <div class="input-group mb-4 border rounded-pill p-1">
-            <input type="search" placeholder="Search" aria-describedby="button-addon3" class="form-control bg-none border-0">
+            <input id="searchbar" type="search" placeholder="Search" aria-describedby="button-addon3" class="form-control bg-none border-0">
             <div class="input-group-append border-0">
               <button id="button-addon3" type="button" class="btn btn-link text-success"><i class="fa fa-search"></i></button>
             </div>
-          </div>
+        </div>
         
-        <div class="showDataBtn">
-            <button class="button-3" id="showWatchDataBtn">Show Watch Data</button>
+        <div class="btn-group">
+            <div class="showDataBtn">
+                <button class="button-3" id="showWatchDataBtn" style="margin-right: 5px;">Show Watch Data</button>
+            </div>
+            
+    
+            <div class="More">
+                <button class="button-3" id="moreOptions" style="margin-left: 5px;">More Options</button>
+            </div>
         </div>
-        <br>
 
-        <div class="More">
-            <button class="button-2" id="moreOptions">More Options</button>
-        </div>
         <br>
 
         <div class="moreSection" style="display: none;">
+            <br>
             <div class="importDataBtn" style="display: block;">
                 <button class="button-3" id="importWatchDataBtn">Import Watch Data</button>
             </div>
