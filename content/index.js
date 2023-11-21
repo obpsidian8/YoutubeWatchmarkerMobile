@@ -399,5 +399,21 @@ function fillpage()
                         }
             chrome.tabs.query({active: true, currentWindow: true}, importTabFunct)
         }
-        
+
+
+        //More button to toggle display
+        document.getElementById("moreOptions").addEventListener("click", toggleDisplay);
+        function  toggleDisplay ()
+        {
+            if (  document.getElementsByClassName("moreSection")[0].style.display==="none")
+            {
+                document.getElementsByClassName("moreSection")[0].style.display = "block";
+            }
+            else
+            {
+                document.getElementsByClassName("moreSection")[0].style.display = "none";
+            }
+            
+
+        }
     }

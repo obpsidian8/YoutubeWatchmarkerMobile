@@ -32,6 +32,7 @@ ytm-thumbnail-overlay-resume-playback-renderer {
 
 .delete_button {
   background-color: #f08989c7;
+  border: 2px solid rgba(13, 20, 13, 0.39);
   font-family: 'Product Sans';
   border-radius: 10px;
   text-align: center;
@@ -43,6 +44,7 @@ ytm-thumbnail-overlay-resume-playback-renderer {
 
 .play_button {
   background-color: #95e9ada4;
+  border: 2px solid rgba(13, 20, 13, 0.39);
   font-family: 'Product Sans';
   border-radius: 10px;
   text-align: center;
@@ -205,6 +207,23 @@ img {
     text-decoration: none;
   }
   
+  .button-2 {
+    background-color: #7deb9c;
+    border: 1px solid rgba(27, 31, 35, .15);
+    border-radius: 12px;
+    box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: Product Sans;
+    font-size: auto;
+    line-height: 20px;
+    padding: 6px 16px;
+    position: center;
+    text-align: center;
+    text-decoration: none;
+  }
+  
   .button-3:focus:not(:focus-visible):not(.focus-visible) {
     box-shadow: none;
     outline: none;
@@ -229,4 +248,17 @@ img {
   .button-3:active {
     background-color: #298e46;
     box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+  }
+
+
+
+.search-container button {
+    float: right;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+    background: #ddd;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
   }

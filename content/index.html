@@ -10,6 +10,7 @@
         <link rel="icon" type="image/png" href="icon.png" />
         <link rel="stylesheet" type="text/css" href="bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="index.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script type="text/javascript" src="index.js"></script>
     </head>
 
@@ -33,27 +34,44 @@
 
         <hr class="rounded">
         
-        <div class="clearBtn">
-            <button class="button-3" id="clearWatchDataBtn">Clear Watch Data</button>
-        </div>
-        <br>
-
+        
+        <div class="input-group mb-4 border rounded-pill p-1">
+            <input type="search" placeholder="Search" aria-describedby="button-addon3" class="form-control bg-none border-0">
+            <div class="input-group-append border-0">
+              <button id="button-addon3" type="button" class="btn btn-link text-success"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+        
         <div class="showDataBtn">
             <button class="button-3" id="showWatchDataBtn">Show Watch Data</button>
         </div>
         <br>
 
-        <div class="importDataBtn">
-            <button class="button-3" id="importWatchDataBtn">Import Watch Data</button>
+        <div class="More">
+            <button class="button-2" id="moreOptions">More Options</button>
         </div>
         <br>
 
-        <form class="importControls" id="importControls">
-        </form>
+        <div class="moreSection" style="display: none;">
+            <div class="importDataBtn" style="display: block;">
+                <button class="button-3" id="importWatchDataBtn">Import Watch Data</button>
+            </div>
+            <br>
+    
+            <form class="importControls" id="importControls">
+            </form>
+    
+            <div class="exportDataBtn" style="display: block;">
+                <button class="button-3" id="exportWatchDataBtn">Export Watch Data</button>
+            </div>
+            <br>
+    
+            <div class="clearBtn" style="display: block;">
+                <button class="button-3" id="clearWatchDataBtn">Clear Watch Data</button>
+            </div>
 
-        <div class="exportDataBtn">
-            <button class="button-3" id="exportWatchDataBtn">Export Watch Data</button>
         </div>
+
         <br>
 
         <div class="watchdata_details" id="watchdata_details">
