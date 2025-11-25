@@ -1,28 +1,30 @@
 {
-   "background": {
-      "scripts": [ "background.js" ]
-   },
-   "browser_action": {
-      "browser_style": false,
+    "background": {
+    "service_worker": "background.js"
+  },
+
+   "action": {
       "default_icon": {
          "150": "content/icon.png"
       },
-      "default_title": "Watchmarker Mobile",
-      "default_popup": "/content/index.html"
+      "default_title": "YouTube Progress Saver",
+      "default_popup": "content/popup.html"
    },
    "content_scripts": [ {
       "css": [ "youtube.css" ],
-      
-      "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ]
+      "js": [ "content.js" ],
+      "matches": [ "*://*.youtube.com/*", "*://m.youtube.com/*" ],
+       "run_at": "document_idle"
+
    } ],
-   "description": "Automatically mark videos on Youtube mobile and desktop that you have already watched.",
    "homepage_url": "https://github.com/obpsidian8/YoutubeWatchmarkerMobile",
    "icons": {
       "128": "content/icon.png"
    },
-   "manifest_version": 2,
-   "name": "Watchmarker Mobile",
-   "permissions": [ "alarms","storage", "downloads", "history", "tabs", "cookies", "webRequest", "webRequestBlocking", "*://www.youtube.com/*", "*://*.ytimg.com/vi/*/*", "*://m.youtube.com/*"],
-   "version": "2.3"
+   "manifest_version": 3,
+   "name": "YouTube Progress Saver",
+   "description": "Save and view YouTube video progress across devices.",
+   "permissions": ["storage", "tabs", "scripting"],
+   "version": "1.0"
 }
 
