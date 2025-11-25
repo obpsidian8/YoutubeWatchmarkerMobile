@@ -1,9 +1,13 @@
+console.log("Content script injected:", window.location.href);
+let lastLocalSave = 0;
+let lastSyncSave = 0;
 (function () {
-  const video = document.querySelector("video");
+  const video = document.getElementsByClassName("video-stream")[0];
   if (!video) return;
 
   console.log("Content script loaded on YouTube page.");
   const videoId = new URLSearchParams(window.location.search).get("v");
+  console.log("Video ID extracted:", videoId);
   let resumedOnce = false;
 
   // On page load, fetch saved progress
@@ -24,23 +28,21 @@
     }
   });
 
-  //
-
-  let lastLocalSave = 0;
-  let lastSyncSave = 0;
-
-  video.addEventListener("timeupdate", () => {
+  function saveProgress() {
     // if (!allowSaving) return;
-    console.log("Timeupdate event fired.");
+    console.log("saveProgress event fired.");
     var dateValue = new Date().toDateString();
+    let timeLastPlayed = new Date().toISOString();
     const now = Date.now();
     // Only save if current time is greater than 30 seconds
     if (video.currentTime < 30) return;
+
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
       currentTime: video.currentTime,
       title: document.title,
       lastPlayed: dateValue,
+      timeLastPlayed: timeLastPlayed,
     };
 
     // Save locally every 5s
@@ -56,15 +58,17 @@
       console.log("Saving progress to sync:", progress);
       chrome.runtime.sendMessage({ type: "SAVE_SYNC", data: progress });
     }
-  });
+  }
 
+  // setInterval(saveProgress, 10000); // Save every 10 seconds
+  video.addEventListener("timeupdate", saveProgress);
+  
   // Extra: save on pause/seek
   ["pause", "seeked"].forEach((evt) => {
     video.addEventListener(evt, () => {
-      //   if (!allowSaving) return;
-
       console.log(`Event ${evt} fired, saving progress (SYNC).`);
       var dateValue = new Date().toDateString();
+      let timeLastPlayed = new Date().toISOString();
       chrome.runtime.sendMessage({
         type: "SAVE_SYNC",
         data: {
@@ -72,8 +76,10 @@
           currentTime: video.currentTime,
           title: document.title,
           lastPlayed: dateValue,
+          timeLastPlayed: timeLastPlayed,
         },
       });
     });
   });
+  //End of pause/seek save
 })();

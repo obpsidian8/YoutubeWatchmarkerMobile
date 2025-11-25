@@ -2,13 +2,13 @@ console.log("Loading background.js");
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`Background received message type: ${message.type}`);
-  const { videoId, currentTime, title, lastPlayed } = message.data;
+  const { videoId, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
 
   if (message.type === "SAVE_LOCAL") {
     console.log("Saving locally:", message.data);
     chrome.storage.local.get(["videos"], (result) => {
       const videos = result.videos || {};
-      videos[videoId] = { title, currentTime, lastPlayed };
+      videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.local.set({ videos });
     });
   }
@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Saving to sync:", message.data);
     chrome.storage.sync.get(["videos"], (result) => {
       const videos = result.videos || {};
-      videos[videoId] = { title, currentTime, lastPlayed };
+      videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.sync.set({ videos });
     });
   }
@@ -50,7 +50,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Videos fetched from local storage:", localResult.videos);
     merged_videos = { ...syncResult.videos, ...localResult.videos };
     console.log("Merged videos:", merged_videos);
-    return merged_videos;
+    // Soert by lastPlayed date descending
+    const sorted_videos = Object.entries(merged_videos).sort((a, b) => {
+      const dateA = new Date(a[1].timeLastPlayed);
+      const dateB = new Date(b[1].timeLastPlayed);
+      return dateA - dateB;
+    });
+    return Object.fromEntries(sorted_videos);
   }
 
   if (message.type === "FETCH_VIDEOS") {
