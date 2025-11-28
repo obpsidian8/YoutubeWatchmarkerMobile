@@ -52,6 +52,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Merged videos:", merged_videos);
     // Soert by lastPlayed date descending
     const sorted_videos = Object.entries(merged_videos).sort((a, b) => {
+      // timeLastPlayed may be undefined for older entries
+      if (!a[1].timeLastPlayed) return 1;
+      if (!b[1].timeLastPlayed) return -1;
       const dateA = new Date(a[1].timeLastPlayed);
       const dateB = new Date(b[1].timeLastPlayed);
       return dateA - dateB;

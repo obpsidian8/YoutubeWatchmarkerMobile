@@ -83,9 +83,18 @@ h2 {
   margin-top: 8px;
 }
 
+.search-container {
+  display: flex;
+  margin-bottom: 15px;
+}
 
-
-
+.searchbar {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 14px ;
+  font-size: 14px;
+}
 
 
 

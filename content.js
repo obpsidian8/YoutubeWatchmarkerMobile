@@ -1,16 +1,20 @@
 console.log("Content script injected:", window.location.href);
+
 let lastLocalSave = 0;
 let lastSyncSave = 0;
-(function () {
-  const video = document.getElementsByClassName("video-stream")[0];
-  if (!video) return;
 
-  console.log("Content script loaded on YouTube page.");
+function attachListeners(video) {
+  if (!video || video.dataset.bound) return;
+  video.dataset.bound = "true";
+
+  console.log("Attaching listeners to video:", video);
+
   const videoId = new URLSearchParams(window.location.search).get("v");
-  console.log("Video ID extracted:", videoId);
   let resumedOnce = false;
 
-  // On page load, fetch saved progress
+  // Resume logic: fetch saved progress and seek
+  //Make sure video is playing before seeking
+  video.addEventListener("playing", () => {
   chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
     console.log("Fetched videos for resuming:", response.videos);
     const videos = response.videos || {};
@@ -18,41 +22,60 @@ let lastSyncSave = 0;
     if (saved && saved.currentTime) {
       console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
       if (!resumedOnce) {
-        console.log(`Resuming video ${videoId} from saved time: ${saved.currentTime}s`);
+
         setTimeout(() => {
           video.currentTime = saved.currentTime;
-        }, 1500); // slight delay to ensure video is ready
-
-        resumedOnce = true; // ensure this only happens once
+          console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
+        }, 2000); // delay ensures video is ready
+        resumedOnce = true;
       }
     }
   });
+});
 
+  // Debug all events
+  [
+    "play",
+    "playing",
+    "pause",
+    "ended",
+    "seeked",
+    "seeking",
+    "timeupdate",
+    "durationchange",
+    "ratechange",
+    "volumechange",
+    "waiting",
+    "canplay",
+    "canplaythrough",
+    "loadeddata",
+    "loadedmetadata",
+  ].forEach((evt) => {
+    video.addEventListener(evt, () => {
+      console.log("event:", evt, video.currentTime);
+    });
+  });
+
+  // Progress saving
   function saveProgress() {
-    // if (!allowSaving) return;
     console.log("saveProgress event fired.");
-    var dateValue = new Date().toDateString();
-    let timeLastPlayed = new Date().toISOString();
     const now = Date.now();
-    // Only save if current time is greater than 30 seconds
     if (video.currentTime < 30) return;
 
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
       currentTime: video.currentTime,
       title: document.title,
-      lastPlayed: dateValue,
-      timeLastPlayed: timeLastPlayed,
+      lastPlayed: new Date().toDateString(),
+      timeLastPlayed: new Date().toISOString(),
     };
 
-    // Save locally every 5s
     if (now - lastLocalSave > 5000) {
       lastLocalSave = now;
       console.log("Saving progress locally:", progress);
       chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: progress });
     }
 
-    // Save to sync every 120s
     if (now - lastSyncSave > 120000) {
       lastSyncSave = now;
       console.log("Saving progress to sync:", progress);
@@ -60,26 +83,32 @@ let lastSyncSave = 0;
     }
   }
 
-  // setInterval(saveProgress, 10000); // Save every 10 seconds
   video.addEventListener("timeupdate", saveProgress);
-  
-  // Extra: save on pause/seek
+
   ["pause", "seeked"].forEach((evt) => {
     video.addEventListener(evt, () => {
       console.log(`Event ${evt} fired, saving progress (SYNC).`);
-      var dateValue = new Date().toDateString();
-      let timeLastPlayed = new Date().toISOString();
       chrome.runtime.sendMessage({
         type: "SAVE_SYNC",
         data: {
           videoId: new URLSearchParams(window.location.search).get("v"),
           currentTime: video.currentTime,
           title: document.title,
-          lastPlayed: dateValue,
-          timeLastPlayed: timeLastPlayed,
+          lastPlayed: new Date().toDateString(),
+          timeLastPlayed: new Date().toISOString(),
         },
       });
     });
   });
-  //End of pause/seek save
-})();
+}
+
+// Watch for new video elements
+const observer = new MutationObserver(() => {
+  console.log("DOM mutation observed. Checking for video elements.");
+  const video = document.querySelector("video.video-stream");
+  attachListeners(video);
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Initial run
+attachListeners(document.querySelector("video.video-stream"));

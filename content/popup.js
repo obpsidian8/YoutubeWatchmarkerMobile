@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderVideos(videos) {
     list.innerHTML = "";
-    Object.entries(videos).forEach(([id, { title, currentTime, lastPlayed }]) => {
+    Object.entries(videos).forEach(([id, { title, currentTime, lastPlayed, timeLastPlayed }]) => {
       //Convert time to hh:mm:ss format
       const formatTime = (seconds) => {
         const hrs = Math.floor(seconds / 3600);
@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const lastPlayedEl = document.createElement("div");
       lastPlayedEl.textContent = `Last played: ${lastPlayed}`;
+
+      const timeLastPlayedEl = document.createElement("div");
+      timeLastPlayedEl.textContent = `Time last played: ${timeLastPlayed}`;
+
 
       const imageElement = document.createElement("img");
       imageElement.src = "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg";
@@ -60,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(titleEl);
       container.appendChild(timeEl);
       container.appendChild(lastPlayedEl);
+      container.appendChild(timeLastPlayedEl);
       container.appendChild(buttonRow);
     });
   }
@@ -71,4 +76,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
     renderVideos(reversedVideos);
   });
+
+  // Search functionality
+  const searchBar = document.getElementById("searchbar");
+  searchBar.addEventListener("input", () => {
+    const query = searchBar.value.toLowerCase();
+    const videoItems = document.getElementsByClassName("video_item");
+    Array.from(videoItems).forEach((item) => {
+      const title = item.querySelector("div").textContent.toLowerCase();
+      if (title.includes(query)) {
+        item.style.display = "";
+      } else {
+        item.style.display = "none";
+      }
+    });
+  });
+
+  
 });
