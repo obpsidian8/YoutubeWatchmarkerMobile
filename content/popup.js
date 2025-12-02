@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteButton.addEventListener("click", () => {
         console.log(`Delete button clicked for video ${id}`);
         chrome.runtime.sendMessage({ type: "DELETE_VIDEO", data: { videoId: id } });
+        container.remove(); // Remove the video item from the popup
       });
 
       const resumeButton = document.createElement("button");
