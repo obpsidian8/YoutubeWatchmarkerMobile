@@ -2,36 +2,37 @@ console.log("Content script injected:", window.location.href);
 
 let lastLocalSave = 0;
 let lastSyncSave = 0;
+let timeSpentPlaying = 0;
 
 function attachListeners(video) {
   if (!video || video.dataset.bound) return;
   video.dataset.bound = "true";
 
-  console.log("Attaching listeners to video:", video);
-
   const videoId = new URLSearchParams(window.location.search).get("v");
   let resumedOnce = false;
+  console.log(`Attaching listeners to video:${videoId}`);
+  console.log(`Video resumedOnce flag: ${resumedOnce}`);
 
   // Resume logic: fetch saved progress and seek
   //Make sure video is playing before seeking
   video.addEventListener("playing", () => {
-  chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
-    console.log("Fetched videos for resuming:", response.videos);
-    const videos = response.videos || {};
-    const saved = videos[videoId];
-    if (saved && saved.currentTime) {
-      console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
-      if (!resumedOnce) {
-
-        setTimeout(() => {
-          video.currentTime = saved.currentTime;
-          console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
-        }, 2000); // delay ensures video is ready
-        resumedOnce = true;
+    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
+      console.log("Fetched videos for resuming:", response.videos);
+      const videos = response.videos || {};
+      const saved = videos[videoId];
+      if (saved && saved.currentTime) {
+        console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
+        console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
+        if (!resumedOnce) {
+          setTimeout(() => {
+            video.currentTime = saved.currentTime;
+            console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
+          }, 2000); // delay ensures video is ready
+          resumedOnce = true;
+        }
       }
-    }
+    });
   });
-});
 
   // Debug all events
   [
@@ -58,9 +59,15 @@ function attachListeners(video) {
 
   // Progress saving
   function saveProgress() {
-    console.log("saveProgress event fired.");
+    console.log("timeupdate event fired.");
+    // Increase time spent playing
+    //timeupdate fires 4 times per second, so 120 events = 30 seconds
+    timeSpentPlaying += 1;
+
     const now = Date.now();
-    if (video.currentTime < 30) return;
+    // We will save video progress if video has been playing for more than 30 seconds
+    
+    if (timeSpentPlaying < 120) return;
 
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
