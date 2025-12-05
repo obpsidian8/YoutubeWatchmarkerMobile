@@ -68,14 +68,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "RESUME_VIDEO") {
-    chrome.storage.sync.get(["videos"], (result) => {
-      const videos = result.videos || {};
+    fetchVideos().then((videos) => {
       const saved = videos[videoId];
+      console.log(`Resuming video ${videoId}:${saved}`);
       if (saved) {
         const url = `https://www.youtube.com/watch?v=${videoId}&t=${Math.floor(saved.currentTime)}s`;
         chrome.tabs.create({ url });
       }
     });
   }
+
+
 
 });
