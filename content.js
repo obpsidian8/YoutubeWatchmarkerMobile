@@ -60,10 +60,9 @@ function attachListeners(video) {
 
   // Progress saving
   function saveProgress() {
-    console.log("timeupdate event fired.");
     // Increase time spent playing
     //timeupdate fires 4 times per second, so 120 events = 30 seconds
-    console.log(`timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
+    console.log(`timeupdate event fired!! timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
     timeUpdateEventCount += 1;
 
     const now = Date.now();
@@ -96,9 +95,9 @@ function attachListeners(video) {
 
   ["pause", "seeked"].forEach((evt) => {
     video.addEventListener(evt, () => {
-      console.log(`Event ${evt} fired, saving progress (SYNC).`);
       // if timeSpentPlaying is less than 30 seconds, do not save
       if (timeUpdateEventCount < 120) return;
+      console.log(`Event ${evt} fired, saving progress (SYNC).`);
 
       chrome.runtime.sendMessage({
         type: "SAVE_SYNC",
