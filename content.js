@@ -95,6 +95,9 @@ function attachListeners(video) {
   ["pause", "seeked"].forEach((evt) => {
     video.addEventListener(evt, () => {
       console.log(`Event ${evt} fired, saving progress (SYNC).`);
+      // if timeSpentPlaying is less than 30 seconds, do not save
+      if (timeSpentPlaying < 120) return;
+
       chrome.runtime.sendMessage({
         type: "SAVE_SYNC",
         data: {
