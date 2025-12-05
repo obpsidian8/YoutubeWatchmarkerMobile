@@ -3,13 +3,14 @@ console.log("Content script injected:", window.location.href);
 let lastLocalSave = 0;
 let lastSyncSave = 0;
 let timeUpdateEventCount = 0;
+let resumedOnce = false;
 
 function attachListeners(video) {
   if (!video || video.dataset.bound) return;
   video.dataset.bound = "true";
 
   const videoId = new URLSearchParams(window.location.search).get("v");
-  let resumedOnce = false;
+  
   console.log(`Attaching listeners to video:${videoId}`);
   console.log(`Video resumedOnce flag: ${resumedOnce}`);
 
