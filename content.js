@@ -2,7 +2,7 @@ console.log("Content script injected:", window.location.href);
 
 let lastLocalSave = 0;
 let lastSyncSave = 0;
-let timeSpentPlaying = 0;
+let timeUpdateEventCount = 0;
 
 function attachListeners(video) {
   if (!video || video.dataset.bound) return;
@@ -62,12 +62,13 @@ function attachListeners(video) {
     console.log("timeupdate event fired.");
     // Increase time spent playing
     //timeupdate fires 4 times per second, so 120 events = 30 seconds
-    timeSpentPlaying += 1;
+    console.log(`timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
+    timeUpdateEventCount += 1;
 
     const now = Date.now();
     // We will save video progress if video has been playing for more than 30 seconds
     
-    if (timeSpentPlaying < 120) return;
+    if (timeUpdateEventCount < 120) return;
 
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
@@ -96,7 +97,7 @@ function attachListeners(video) {
     video.addEventListener(evt, () => {
       console.log(`Event ${evt} fired, saving progress (SYNC).`);
       // if timeSpentPlaying is less than 30 seconds, do not save
-      if (timeSpentPlaying < 120) return;
+      if (timeUpdateEventCount < 120) return;
 
       chrome.runtime.sendMessage({
         type: "SAVE_SYNC",
