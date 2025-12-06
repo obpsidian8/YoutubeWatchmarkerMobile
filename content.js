@@ -1,21 +1,27 @@
+// This is injected into a single page application. This means that the script is only injected once,
+// and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
-
-let lastLocalSave = 0;
-let lastSyncSave = 0;
-let timeUpdateEventCount = 0;
-let resumedOnce = false;
+let CURRENT_VIDEO_ID = null; // Track the current video ID to avoid re-attaching listeners
 
 function attachListeners(video) {
-  if (!video || video.dataset.bound) return;
-  video.dataset.bound = "true";
+  let lastLocalSave = 0;
+  let lastSyncSave = 0;
+  let timeUpdateEventCount = 0;
+  let resumedOnce = false;
+
+  if (!video) {
+    console.log("Video element is null. Cannot attach listeners.");
+    return;
+  }
 
   const videoId = new URLSearchParams(window.location.search).get("v");
+  CURRENT_VIDEO_ID = videoId;
   if (!videoId) {
     console.log("No videoId found in URL, cannot attach listeners.");
     return;
   }
-  
-  console.log(`Attaching listeners to video:${videoId}`);
+
+  console.log(`Attaching listeners to video: ${videoId}`);
   console.log(`Video resumedOnce flag: ${resumedOnce}`);
 
   // Resume logic: fetch saved progress and seek
@@ -115,12 +121,22 @@ function attachListeners(video) {
   });
 }
 
-// Watch for new video elements
+// Define a MutationObserver to watch for video element additions
 const observer = new MutationObserver(() => {
   console.log("DOM mutation observed. Checking for video elements.");
   const video = document.querySelector("video.video-stream");
+  // This detects all dom changes such as loading of nodes and tags. Also, the same vidoe element may persist across navigations.
+  // So we need to check if we have already attached listeners for the current videoId.
+  let newVideoId = new URLSearchParams(window.location.search).get("v");
+  if (video && newVideoId === CURRENT_VIDEO_ID) {
+    console.log("Video element already processed for current videoId.");
+    return;
+  }
+  console.log("Video element found by observer:");
   attachListeners(video);
 });
+
+//Catch dynamic page changes
 observer.observe(document.body, { childList: true, subtree: true });
 
 // Initial run

@@ -24,6 +24,6 @@
    "name": "YouTube Progress Saver",
    "description": "Save and view YouTube video progress across devices.",
    "permissions": ["storage", "tabs", "scripting"],
-   "version": "1.77"
+   "version": "1.78"
 }
 
