@@ -6,6 +6,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "SAVE_LOCAL") {
     console.log("Saving locally:", message.data);
+    // Will not sasve if videoId is undefined
+    if (!videoId) return;
     chrome.storage.local.get(["videos"], (result) => {
       const videos = result.videos || {};
       videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
@@ -15,6 +17,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "SAVE_SYNC") {
     console.log("Saving to sync:", message.data);
+    // Will not sasve if videoId is undefined
+    if (!videoId) return;
     chrome.storage.sync.get(["videos"], (result) => {
       const videos = result.videos || {};
       videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
