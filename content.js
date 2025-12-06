@@ -10,6 +10,10 @@ function attachListeners(video) {
   video.dataset.bound = "true";
 
   const videoId = new URLSearchParams(window.location.search).get("v");
+  if (!videoId) {
+    console.log("No videoId found in URL, cannot attach listeners.");
+    return;
+  }
   
   console.log(`Attaching listeners to video:${videoId}`);
   console.log(`Video resumedOnce flag: ${resumedOnce}`);
