@@ -2,6 +2,25 @@
 // and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
 let CURRENT_VIDEO_ID = null; // Track the current video ID to avoid re-attaching listeners
+video_events = [
+  "play",
+  "playing",
+  "pause",
+  "ended",
+  "seeked",
+  "seeking",
+  "timeupdate",
+  "durationchange",
+  "ratechange",
+  "volumechange",
+  "waiting",
+  "canplay",
+  "canplaythrough",
+  "loadeddata",
+  "loadedmetadata",
+];
+
+special_force_save_events = ["pause", "seeked"];
 
 function attachListeners(video) {
   let lastLocalSave = 0;
@@ -20,55 +39,26 @@ function attachListeners(video) {
     console.log("No videoId found in URL, cannot attach listeners.");
     return;
   }
+  
+  // Remove old listeners first before attaching new ones
+  video.removeEventListener("timeupdate", saveProgress);
+  video.removeEventListener("playing", resumeVideo);
+  video_events.forEach((evt) => {
+    video.removeEventListener(evt, logEvents);
+  });
+  special_force_save_events.forEach((evt) => {
+    video.removeEventListener(evt, forceSaveProgress);
+  });
 
   console.log(`Attaching listeners to video: ${videoId}`);
   console.log(`Video resumedOnce flag: ${resumedOnce}`);
 
-  // Resume logic: fetch saved progress and seek
-  //Make sure video is playing before seeking
-  video.addEventListener("playing", () => {
-    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
-      console.log("Fetched videos for resuming:", response.videos);
-      const videos = response.videos || {};
-      const saved = videos[videoId];
-      if (saved && saved.currentTime) {
-        console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
-        console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
-        if (!resumedOnce) {
-          setTimeout(() => {
-            video.currentTime = saved.currentTime;
-            console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
-          }, 2000); // delay ensures video is ready
-          resumedOnce = true;
-        }
-      }
-    });
-  });
-
   // Debug all events
-  [
-    "play",
-    "playing",
-    "pause",
-    "ended",
-    "seeked",
-    "seeking",
-    "timeupdate",
-    "durationchange",
-    "ratechange",
-    "volumechange",
-    "waiting",
-    "canplay",
-    "canplaythrough",
-    "loadeddata",
-    "loadedmetadata",
-  ].forEach((evt) => {
-    video.addEventListener(evt, () => {
-      console.log("event:", evt, video.currentTime);
-    });
-  });
+  function logEvents(evt) {
+    console.log("event:", evt.type, video.currentTime);
+  }
 
-  // Progress saving
+  // Regular progress saving function
   function saveProgress() {
     // Increase time spent playing
     console.log(`timeupdate event fired!! timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
@@ -99,25 +89,61 @@ function attachListeners(video) {
     }
   }
 
+  //Forced save progress function for special events
+  function forceSaveProgress(evt) {
+    // if timeSpentPlaying is less than 15 seconds, do not save
+    if (timeUpdateEventCount < 60) return;
+    console.log(`Event ${evt.type} fired, saving progress (SYNC).`);
+
+    chrome.runtime.sendMessage({
+      type: "SAVE_SYNC",
+      data: {
+        videoId: new URLSearchParams(window.location.search).get("v"),
+        currentTime: video.currentTime,
+        title: document.title,
+        lastPlayed: new Date().toDateString(),
+        timeLastPlayed: new Date().toISOString(),
+      },
+    });
+  }
+
+  function resumeVideo() {
+    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
+      console.log(`Fetched videos for resuming ${videoId}:`, response.videos);
+      const videos = response.videos || {};
+      const saved = videos[videoId];
+      console.log(`Resuming video ${videoId}:`, saved);
+      if (saved && saved.currentTime) {
+        console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
+        console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
+        if (!resumedOnce) {
+          setTimeout(() => {
+            video.currentTime = saved.currentTime;
+            console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
+          }, 2000); // delay ensures video is ready
+          resumedOnce = true;
+        }
+      }else {
+        console.log(`No saved progress found for video ${videoId}`);
+      }
+    });
+  }
+
+  // Resume logic: fetch saved progress and seek
+  //Make sure video is playing before seeking
+  video.addEventListener("playing", resumeVideo);
+
+  // Debug all events
+  video_events.forEach((evt) => {
+    video.addEventListener(evt, logEvents);
+  });
+
+  // Attach main progress saving listener
   video.addEventListener("timeupdate", saveProgress);
 
-  ["pause", "seeked"].forEach((evt) => {
-    video.addEventListener(evt, () => {
-      // if timeSpentPlaying is less than 15 seconds, do not save
-      if (timeUpdateEventCount < 60) return;
-      console.log(`Event ${evt} fired, saving progress (SYNC).`);
-
-      chrome.runtime.sendMessage({
-        type: "SAVE_SYNC",
-        data: {
-          videoId: new URLSearchParams(window.location.search).get("v"),
-          currentTime: video.currentTime,
-          title: document.title,
-          lastPlayed: new Date().toDateString(),
-          timeLastPlayed: new Date().toISOString(),
-        },
-      });
-    });
+  // Attach special force save listeners
+  special_force_save_events.forEach((evt) => {
+    video.addEventListener(evt, forceSaveProgress);
   });
 }
 
@@ -133,6 +159,9 @@ const observer = new MutationObserver(() => {
     return;
   }
   console.log("Video element found by observer:");
+  // Since window element may persist, remove old listeners first before attaching new ones. (timeupdate, playing)
+  // Remove the within the attachListeners function
+
   attachListeners(video);
 });
 
