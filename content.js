@@ -113,11 +113,18 @@ function attachListeners(video) {
       if (saved && saved.currentTime) {
         console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
         console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
+        // Check if saved time is different from current time to avoid redundant seeks
+        if (Math.abs(video.currentTime - saved.currentTime) < 1) {
+          console.log(`Video ${videoId} is already at the saved time: ${saved.currentTime}s, no need to seek.`);
+          resumedOnce = true;
+          return;
+        }
+
         if (!resumedOnce) {
           setTimeout(() => {
             video.currentTime = saved.currentTime;
             console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
-          }, 2000); // delay ensures video is ready
+          }, 1000); // delay ensures video is ready
           resumedOnce = true;
         }
       } else {
