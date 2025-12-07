@@ -159,19 +159,18 @@ function attachListeners(video) {
 
   function cleanupListeners(video) {
     if (!video) {
-      console.log("No video element provided for cleanup.");
+      console.log(`Instance ${latest_instance_id}:  No video element provided for cleanup.`);
       return;
     }
 
     // Look up handlers for this video
     const handlers = handlerRegistry.get(video);
     if (!handlers) {
-      console.log("No handlers found in registry for this video.");
+      console.log(`Instance ${latest_instance_id}: No handlers found in registry for this video ${videoId}.`);
       return;
     }
 
-    console.log(`Cleaning up ${handlers.length} listeners for video.`);
-
+    console.log(`Instance ${latest_instance_id}: Cleaning up ${handlers.length} listeners for video ${videoId}.`);
     // Remove each listener using the stored reference
     handlers.forEach(({ type, fn }) => {
       video.removeEventListener(type, fn);
