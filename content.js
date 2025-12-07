@@ -1,7 +1,7 @@
 // This is injected into a single page application. This means that the script is only injected once,
 // and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
-let CURRENT_VIDEO_ID = null; // Track the current video ID to avoid re-attaching listeners
+let SAVED_VID_ID = null; // Track the current video ID to avoid re-attaching listeners
 video_events = [
   "play",
   "playing",
@@ -39,7 +39,7 @@ function attachListeners(video) {
     return;
   }
 
-  CURRENT_VIDEO_ID = videoId;
+  SAVED_VID_ID = videoId;
   // Remove old listeners first before attaching new ones
   video.removeEventListener("timeupdate", saveProgress);
   video.removeEventListener("playing", resumeVideo);
@@ -147,15 +147,32 @@ function attachListeners(video) {
 
 // Define a MutationObserver to watch for video element additions
 const observer = new MutationObserver(() => {
-  console.log("DOM mutation observed. Checking for video elements.");
+  console.log("\n---------------------------------------------------------------------------------------------------");
+  console.log("DOM mutation observed.");
   const video = document.querySelector("video.video-stream");
   // This detects all dom changes such as loading of nodes and tags. Also, the same vidoe element may persist across navigations.
   // So we need to check if we have already attached listeners for the current videoId.
   let newVideoId = new URLSearchParams(window.location.search).get("v");
-  if (video && newVideoId === CURRENT_VIDEO_ID) {
-    console.log("Video element already processed for current videoId.");
+  console.log(`videoId from URL: ${newVideoId}, SAVED_VID_ID: ${SAVED_VID_ID}`);
+
+  //Check if dom change corresponds to a new videoId
+  if (newVideoId === SAVED_VID_ID) {
+    console.log(`DOM changed on SAME page: ${newVideoId}. No need to re-attach listeners.`);
     return;
   }
+  
+  if (!newVideoId) {
+    console.log("DOM changed to NEW page with NO videoId. Resetting SAVED_VID_ID.");
+    SAVED_VID_ID = null; // Reset saved video ID
+    return;
+  }
+
+  console.log(`DOM changed to NEW page: ${newVideoId}. Attaching listeners if video element exists.`);
+  if (!video) {
+    console.log("No video element found on the page.");
+    return;
+  }
+
   console.log("Video element found by observer:");
   // Since window element may persist, remove old listeners first before attaching new ones. (timeupdate, playing)
   // Remove the within the attachListeners function
