@@ -1,8 +1,9 @@
 // This is injected into a single page application. This means that the script is only injected once,
 // and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
+let GLOBAL_INSTANCE_ID = null;
 let SAVED_VID_ID = null; // Track the current video ID to avoid re-attaching listeners
-video_events = [
+const video_events = [
   "play",
   "playing",
   "pause",
@@ -23,11 +24,18 @@ video_events = [
 special_force_save_events = ["pause", "seeked"];
 
 function attachListeners(video) {
+  let latest_instance_id = Math.random().toString(36).substring(2, 10);
+  console.log(`Latest Instance ID: ${latest_instance_id}, Global Instance ID: ${GLOBAL_INSTANCE_ID}`);
+  GLOBAL_INSTANCE_ID = latest_instance_id;
+
+  //We  will only run the functions here if this instance matches the global instance id
+  // Every new instance created will update the global instance id ensuring only the latest instance is active
+
   let lastLocalSave = 0;
   let lastSyncSave = 0;
   let timeUpdateEventCount = 0;
   let resumedOnce = false;
-  const saveDelayTimeout = 5;
+  const saveDelayTimeout = 60; // Number of timeupdate events before saving (approx 15 seconds)
 
   if (!video) {
     console.log("Video element is null. Cannot attach listeners.");
@@ -42,6 +50,7 @@ function attachListeners(video) {
 
   SAVED_VID_ID = videoId;
   // Remove old listeners first before attaching new ones
+  console.log(`Removing old listeners for video: ${videoId}`);
   video.removeEventListener("timeupdate", saveProgress);
   video.removeEventListener("playing", resumeVideo);
   video_events.forEach((evt) => {
@@ -53,18 +62,26 @@ function attachListeners(video) {
 
   // Debug all events
   function logEvents(evt) {
-    console.log("event:", evt.type, video.currentTime);
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting logEvents.`);
+      return;
+    }
+    console.log(`Instance ${latest_instance_id}: event:`, evt.type, video.currentTime);
   }
 
   // Regular progress saving function
   function saveProgress() {
     // Increase time spent playing
-    console.log(`timeupdate event fired!! timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting saveProgress.`);
+      return;
+    }
+    console.log(`Instance ${latest_instance_id} .timeupdate event fired!! timeUpdateEventCount before increment: ${timeUpdateEventCount}`);
     timeUpdateEventCount += 1;
 
     const now = Date.now();
     // We will save video progress if video has been playing for more than 15 seconds
-    // if (timeUpdateEventCount < saveDelayTimeout) return;
+    if (timeUpdateEventCount < saveDelayTimeout) return;
 
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
@@ -76,22 +93,26 @@ function attachListeners(video) {
 
     if (now - lastLocalSave > 3000) {
       lastLocalSave = now;
-      console.log("Saving progress locally:", progress);
+      console.log(`Instance ${latest_instance_id} Saving progress locally:`, progress);
       chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: progress });
     }
 
     if (now - lastSyncSave > 120000) {
       lastSyncSave = now;
-      console.log("Saving progress to sync:", progress);
+      console.log(`Instance ${latest_instance_id} Saving progress to sync:`, progress);
       chrome.runtime.sendMessage({ type: "SAVE_SYNC", data: progress });
     }
   }
 
   //Forced save progress function for special events
   function forceSaveProgress(evt) {
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting forceSaveProgress.`);
+      return;
+    }
     // if timeSpentPlaying is less than 15 seconds, do not save
-    // if (timeUpdateEventCount < saveDelayTimeout) return;
-    console.log(`Event ${evt.type} fired, saving progress (SYNC).`);
+    if (timeUpdateEventCount < saveDelayTimeout) return;
+    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, saving progress (SYNC).`);
 
     chrome.runtime.sendMessage({
       type: "SAVE_SYNC",
@@ -106,19 +127,23 @@ function attachListeners(video) {
   }
 
   function resumeVideo() {
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting resumeVideo.`);
+      return;
+    }
     chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
-      console.log(`Fetched videos for resuming ${videoId}:`, response.videos);
+      console.log(`Instance ${latest_instance_id}: Fetched videos for resuming ${videoId}:`, response.videos);
       const videos = response.videos || {};
       const saved = videos[videoId];
-      console.log(`Resuming video ${videoId}:`, saved);
+      console.log(`Instance ${latest_instance_id}: Resuming video ${videoId}:`, saved);
       if (saved && saved.currentTime) {
-        console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
-        console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
+        console.log(`Instance ${latest_instance_id}: Found video ${videoId} at saved time: ${saved.currentTime}s`);
+        console.log(`Instance ${latest_instance_id}: Video resumedOnce flag before seeking: ${resumedOnce}`);
         // Check if saved time is different from current time to avoid redundant seeks
         let diff = Math.abs(video.currentTime - saved.currentTime);
-        console.log(`Current time: ${video.currentTime}s, Saved time: ${saved.currentTime}s, Difference: ${diff}s`);
+        console.log(`Instance ${latest_instance_id}: Current time: ${video.currentTime}s, Saved time: ${saved.currentTime}s, Difference: ${diff}s`);
         if (diff < 3) {
-          console.log(`Video ${videoId} is already at the saved time: ${saved.currentTime}s, no need to seek.`);
+          console.log(`Instance ${latest_instance_id}: Video ${videoId} is already at the saved time: ${saved.currentTime}s, no need to seek.`);
           resumedOnce = true;
           return;
         }
@@ -126,17 +151,17 @@ function attachListeners(video) {
         if (!resumedOnce) {
           setTimeout(() => {
             video.currentTime = saved.currentTime;
-            console.log(`Resumed video ${videoId} to ${saved.currentTime}s`);
+            console.log(`Instance ${latest_instance_id}: Resumed video ${videoId} to ${saved.currentTime}s`);
           }, 1000); // delay ensures video is ready
           resumedOnce = true;
         }
       } else {
-        console.log(`No saved progress found for video ${videoId}`);
+        console.log(`Instance ${latest_instance_id}: No saved progress found for video ${videoId}`);
       }
     });
   }
 
-  console.log(`Attaching listeners to video: ${videoId}`);
+  console.log(`Instance ${latest_instance_id}: Attaching listeners to video: ${videoId}`);
   // Resume logic: fetch saved progress and seek
   //Make sure video is playing before seeking
   video.addEventListener("playing", resumeVideo);
@@ -170,7 +195,7 @@ const observer = new MutationObserver(() => {
     console.log(`DOM changed on SAME page: ${newVideoId}. No need to re-attach listeners.`);
     return;
   }
-  
+
   if (!newVideoId) {
     console.log("DOM changed to NEW page with NO videoId. Resetting SAVED_VID_ID.");
     SAVED_VID_ID = null; // Reset saved video ID
