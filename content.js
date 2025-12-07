@@ -1,6 +1,9 @@
 // This is injected into a single page application. This means that the script is only injected once,
 // and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
+// Registry: video element -> array of { type, fn }
+const handlerRegistry = new Map();
+
 let GLOBAL_INSTANCE_ID = null; // Used to keep track of functions run by listeners.
 // Track the latest instance ID to manage multiple instances on SPA navigations.
 
@@ -154,16 +157,32 @@ function attachListeners(video) {
     });
   }
 
+  function cleanupListeners(video) {
+    if (!video) {
+      console.log("No video element provided for cleanup.");
+      return;
+    }
+
+    // Look up handlers for this video
+    const handlers = handlerRegistry.get(video);
+    if (!handlers) {
+      console.log("No handlers found in registry for this video.");
+      return;
+    }
+
+    console.log(`Cleaning up ${handlers.length} listeners for video.`);
+
+    // Remove each listener using the stored reference
+    handlers.forEach(({ type, fn }) => {
+      video.removeEventListener(type, fn);
+    });
+
+    // Remove from registry so closures can be garbage‑collected
+    handlerRegistry.delete(video);
+  }
+
   // Remove old listeners first before attaching new ones
-  console.log(`Removing old listeners for video: ${videoId}`);
-  video.removeEventListener("timeupdate", saveProgress);
-  video.removeEventListener("playing", resumeVideo);
-  video_events.forEach((evt) => {
-    video.removeEventListener(evt, logEvents);
-  });
-  special_force_save_events.forEach((evt) => {
-    video.removeEventListener(evt, forceSaveProgress);
-  });
+  cleanupListeners(video);
 
   console.log(`Instance ${latest_instance_id}: Attaching listeners to video: ${videoId}`);
   // Resume logic: fetch saved progress and seek
@@ -182,6 +201,14 @@ function attachListeners(video) {
   special_force_save_events.forEach((evt) => {
     video.addEventListener(evt, forceSaveProgress);
   });
+
+  // Save references in registry
+  handlerRegistry.set(video, [
+    { type: "timeupdate", fn: saveProgress },
+    { type: "playing", fn: resumeVideo },
+    ...video_events.map((evt) => ({ type: evt, fn: logEvents })),
+    ...special_force_save_events.map((evt) => ({ type: evt, fn: forceSaveProgress })),
+  ]);
 }
 
 // Define a MutationObserver to watch for video element additions
