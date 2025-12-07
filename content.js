@@ -34,12 +34,12 @@ function attachListeners(video) {
   }
 
   const videoId = new URLSearchParams(window.location.search).get("v");
-  CURRENT_VIDEO_ID = videoId;
   if (!videoId) {
     console.log("No videoId found in URL, cannot attach listeners.");
     return;
   }
-  
+
+  CURRENT_VIDEO_ID = videoId;
   // Remove old listeners first before attaching new ones
   video.removeEventListener("timeupdate", saveProgress);
   video.removeEventListener("playing", resumeVideo);
@@ -49,9 +49,6 @@ function attachListeners(video) {
   special_force_save_events.forEach((evt) => {
     video.removeEventListener(evt, forceSaveProgress);
   });
-
-  console.log(`Attaching listeners to video: ${videoId}`);
-  console.log(`Video resumedOnce flag: ${resumedOnce}`);
 
   // Debug all events
   function logEvents(evt) {
@@ -123,12 +120,13 @@ function attachListeners(video) {
           }, 2000); // delay ensures video is ready
           resumedOnce = true;
         }
-      }else {
+      } else {
         console.log(`No saved progress found for video ${videoId}`);
       }
     });
   }
 
+  console.log(`Attaching listeners to video: ${videoId}`);
   // Resume logic: fetch saved progress and seek
   //Make sure video is playing before seeking
   video.addEventListener("playing", resumeVideo);
@@ -161,7 +159,6 @@ const observer = new MutationObserver(() => {
   console.log("Video element found by observer:");
   // Since window element may persist, remove old listeners first before attaching new ones. (timeupdate, playing)
   // Remove the within the attachListeners function
-
   attachListeners(video);
 });
 
