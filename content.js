@@ -73,7 +73,7 @@ function attachListeners(video) {
       timeLastPlayed: new Date().toISOString(),
     };
 
-    if (now - lastLocalSave > 5000) {
+    if (now - lastLocalSave > 3000) {
       lastLocalSave = now;
       console.log("Saving progress locally:", progress);
       chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: progress });
@@ -114,7 +114,9 @@ function attachListeners(video) {
         console.log(`Found video ${videoId} at saved time: ${saved.currentTime}s`);
         console.log(`Video resumedOnce flag before seeking: ${resumedOnce}`);
         // Check if saved time is different from current time to avoid redundant seeks
-        if (Math.abs(video.currentTime - saved.currentTime) < 1) {
+        let diff = Math.abs(video.currentTime - saved.currentTime);
+        console.log(`Current time: ${video.currentTime}s, Saved time: ${saved.currentTime}s, Difference: ${diff}s`);
+        if (diff < 1) {
           console.log(`Video ${videoId} is already at the saved time: ${saved.currentTime}s, no need to seek.`);
           resumedOnce = true;
           return;
