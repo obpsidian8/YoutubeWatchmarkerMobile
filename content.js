@@ -1,8 +1,11 @@
 // This is injected into a single page application. This means that the script is only injected once,
 // and we need to handle dynamic page changes ourselves.
 console.log("Content script injected:", window.location.href);
-let GLOBAL_INSTANCE_ID = null;
-let SAVED_VID_ID = null; // Track the current video ID to avoid re-attaching listeners
+let GLOBAL_INSTANCE_ID = null; // Used to keep track of functions run by listeners.
+// Track the latest instance ID to manage multiple instances on SPA navigations.
+
+let SAVED_VID_ID = null; // Track the current video ID to avoid re-attaching listeners. Used to detect if dom change corresponds to new pages or
+// change in elements on the same page.
 const video_events = [
   "play",
   "playing",
@@ -49,16 +52,6 @@ function attachListeners(video) {
   }
 
   SAVED_VID_ID = videoId;
-  // Remove old listeners first before attaching new ones
-  console.log(`Removing old listeners for video: ${videoId}`);
-  video.removeEventListener("timeupdate", saveProgress);
-  video.removeEventListener("playing", resumeVideo);
-  video_events.forEach((evt) => {
-    video.removeEventListener(evt, logEvents);
-  });
-  special_force_save_events.forEach((evt) => {
-    video.removeEventListener(evt, forceSaveProgress);
-  });
 
   // Debug all events
   function logEvents(evt) {
@@ -161,6 +154,17 @@ function attachListeners(video) {
     });
   }
 
+  // Remove old listeners first before attaching new ones
+  console.log(`Removing old listeners for video: ${videoId}`);
+  video.removeEventListener("timeupdate", saveProgress);
+  video.removeEventListener("playing", resumeVideo);
+  video_events.forEach((evt) => {
+    video.removeEventListener(evt, logEvents);
+  });
+  special_force_save_events.forEach((evt) => {
+    video.removeEventListener(evt, forceSaveProgress);
+  });
+
   console.log(`Instance ${latest_instance_id}: Attaching listeners to video: ${videoId}`);
   // Resume logic: fetch saved progress and seek
   //Make sure video is playing before seeking
@@ -184,7 +188,7 @@ function attachListeners(video) {
 const observer = new MutationObserver(() => {
   console.log("\n---------------------------------------------------------------------------------------------------");
   console.log("DOM mutation observed.");
-  const video = document.querySelector("video.video-stream");
+  const video = document.querySelector("video") || document.querySelector("video.video-stream");
   // This detects all dom changes such as loading of nodes and tags. Also, the same vidoe element may persist across navigations.
   // So we need to check if we have already attached listeners for the current videoId.
   let newVideoId = new URLSearchParams(window.location.search).get("v");
@@ -218,4 +222,5 @@ const observer = new MutationObserver(() => {
 observer.observe(document.body, { childList: true, subtree: true });
 
 // Initial run
-attachListeners(document.querySelector("video.video-stream"));
+const video = document.querySelector("video") || document.querySelector("video.video-stream");
+attachListeners(video);
