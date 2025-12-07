@@ -27,6 +27,7 @@ function attachListeners(video) {
   let lastSyncSave = 0;
   let timeUpdateEventCount = 0;
   let resumedOnce = false;
+  const saveDelayTimeout = 5;
 
   if (!video) {
     console.log("Video element is null. Cannot attach listeners.");
@@ -63,7 +64,7 @@ function attachListeners(video) {
 
     const now = Date.now();
     // We will save video progress if video has been playing for more than 15 seconds
-    if (timeUpdateEventCount < 60) return;
+    // if (timeUpdateEventCount < saveDelayTimeout) return;
 
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
@@ -89,7 +90,7 @@ function attachListeners(video) {
   //Forced save progress function for special events
   function forceSaveProgress(evt) {
     // if timeSpentPlaying is less than 15 seconds, do not save
-    if (timeUpdateEventCount < 60) return;
+    // if (timeUpdateEventCount < saveDelayTimeout) return;
     console.log(`Event ${evt.type} fired, saving progress (SYNC).`);
 
     chrome.runtime.sendMessage({
@@ -116,7 +117,7 @@ function attachListeners(video) {
         // Check if saved time is different from current time to avoid redundant seeks
         let diff = Math.abs(video.currentTime - saved.currentTime);
         console.log(`Current time: ${video.currentTime}s, Saved time: ${saved.currentTime}s, Difference: ${diff}s`);
-        if (diff < 1) {
+        if (diff < 3) {
           console.log(`Video ${videoId} is already at the saved time: ${saved.currentTime}s, no need to seek.`);
           resumedOnce = true;
           return;
