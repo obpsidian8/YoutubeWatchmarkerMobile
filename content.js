@@ -9,6 +9,9 @@ let GLOBAL_INSTANCE_ID = null; // Used to keep track of functions run by listene
 
 let SAVED_VID_ID = null; // Track the current video ID to avoid re-attaching listeners. Used to detect if dom change corresponds to new pages or
 // change in elements on the same page.
+
+let LISTENER_ATTACHED = false; // Flag to track if listeners have been attached
+
 const video_events = [
   "play",
   "playing",
@@ -42,6 +45,9 @@ function attachListeners(video) {
   let timeUpdateEventCount = 0;
   let resumedOnce = false;
   const saveDelayTimeout = 60; // Number of timeupdate events before saving (approx 15 seconds)
+
+  //log videe element first
+  console.log("Attaching listeners to video element:", video);
 
   if (!video) {
     console.log("Video element is null. Cannot attach listeners.");
@@ -208,6 +214,8 @@ function attachListeners(video) {
     ...video_events.map((evt) => ({ type: evt, fn: logEvents })),
     ...special_force_save_events.map((evt) => ({ type: evt, fn: forceSaveProgress })),
   ]);
+  console.log(`Instance ${latest_instance_id}: Listeners attached to video: ${videoId}`);
+  LISTENER_ATTACHED = true;
 }
 
 // Define a MutationObserver to watch for video element additions
@@ -221,7 +229,7 @@ const observer = new MutationObserver(() => {
   console.log(`videoId from URL: ${newVideoId}, SAVED_VID_ID: ${SAVED_VID_ID}`);
 
   //Check if dom change corresponds to a new videoId
-  if (newVideoId === SAVED_VID_ID) {
+  if (newVideoId === SAVED_VID_ID && LISTENER_ATTACHED) {
     console.log(`DOM changed on SAME page: ${newVideoId}. No need to re-attach listeners.`);
     return;
   }
@@ -229,19 +237,25 @@ const observer = new MutationObserver(() => {
   if (!newVideoId) {
     console.log("DOM changed to NEW page with NO videoId. Resetting SAVED_VID_ID.");
     SAVED_VID_ID = null; // Reset saved video ID
+    LISTENER_ATTACHED = false; // Reset listener attached flag
     return;
   }
 
-  console.log(`DOM changed to NEW page: ${newVideoId}. Attaching listeners if video element exists.`);
   if (!video) {
-    console.log("No video element found on the page.");
+    console.log(`DOM changed to NEW page ${newVideoId} but no video element found.`);
     return;
   }
 
-  console.log("Video element found by observer:");
+  console.log(`DOM changed to NEW page with video element. ${newVideoId}.`);
   // Since window element may persist, remove old listeners first before attaching new ones. (timeupdate, playing)
   // Remove the within the attachListeners function
-  attachListeners(video);
+  if (video && video.src && video.src.startsWith("blob:")) {
+    // Valid video element found, attach listeners
+    console.log(`Valid video element found for new videoId ${newVideoId}, attaching listeners.`);
+    attachListeners(video);
+  }else{
+    console.log(`Video not ready yet for new videoId ${newVideoId}`);
+  }
 });
 
 //Catch dynamic page changes
@@ -249,4 +263,10 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Initial run
 const video = document.querySelector("video") || document.querySelector("video.video-stream");
-attachListeners(video);
+if (video && video.src && video.src.startsWith("blob:")) {
+  // Valid video element found, attach listeners
+  console.log(`Valid video element found for new videoId ${newVideoId}`);
+  attachListeners(video);
+} else {
+  console.log("Video not ready yet on initial load.");
+}
