@@ -88,6 +88,7 @@ function attachListeners(video) {
     const progress = {
       videoId: new URLSearchParams(window.location.search).get("v"),
       currentTime: video.currentTime,
+      duration: video.duration,
       title: document.title,
       lastPlayed: new Date().toDateString(),
       timeLastPlayed: new Date().toISOString(),
@@ -121,6 +122,7 @@ function attachListeners(video) {
       data: {
         videoId: new URLSearchParams(window.location.search).get("v"),
         currentTime: video.currentTime,
+        duration: video.duration,
         title: document.title,
         lastPlayed: new Date().toDateString(),
         timeLastPlayed: new Date().toISOString(),

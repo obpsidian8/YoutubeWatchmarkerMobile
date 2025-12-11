@@ -29,9 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const timeLastPlayedEl = document.createElement("div");
       timeLastPlayedEl.textContent = `Time last played: ${timeLastPlayed}`;
 
-
       const imageElement = document.createElement("img");
       imageElement.src = "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg";
+
+      // Create progress bar
+      const progressBar = document.createElement("progress");
+      // Express progress bar value as a percent of duration
+      console.log(`Video ${id} duration: ${videos[id].duration}, currentTime: ${currentTime}`);
+      progressBar.value = (currentTime / (videos[id].duration || 1)) * 100; // Avoid division by zero
+      progressBar.max = 100;
+      progressBar.className = "progress_bar";
 
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
@@ -54,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       list.appendChild(container);
-      container.appendChild(imageElement);
 
       const buttonRow = document.createElement("div");
       buttonRow.className = "button_row";
@@ -62,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       buttonRow.appendChild(resumeButton);
 
       container.appendChild(imageElement);
+      container.appendChild(progressBar);
       container.appendChild(titleEl);
       container.appendChild(timeEl);
       container.appendChild(lastPlayedEl);

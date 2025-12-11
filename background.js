@@ -2,7 +2,7 @@ console.log("Loading background.js");
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`Background received message type: ${message.type}`);
-  const { videoId, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
+  const { videoId,duration, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
 
   if (message.type === "SAVE_LOCAL") {
     console.log("Saving locally:", message.data);
@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!videoId) return;
     chrome.storage.local.get(["videos"], (result) => {
       const videos = result.videos || {};
-      videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
+      videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.local.set({ videos });
     });
   }
@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!videoId) return;
     chrome.storage.sync.get(["videos"], (result) => {
       const videos = result.videos || {};
-      videos[videoId] = { title, currentTime, lastPlayed, timeLastPlayed };
+      videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.sync.set({ videos });
     });
   }

@@ -96,6 +96,25 @@ h2 {
   font-size: 14px;
 }
 
+progress {
+  width: 100%;
+  height: 10px;
+}
 
+.progress_bar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress_bar::-webkit-progress-bar {
+  background-color: #eee;
+}
+.progress_bar::-webkit-progress-value {
+  background-color: #36b132;
+}
 
 
