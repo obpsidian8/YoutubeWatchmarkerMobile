@@ -196,6 +196,16 @@ function attachListeners(video) {
   //Make sure video is playing before seeking
   video.addEventListener("playing", resumeVideo);
 
+  // Add listener for seeked event to set resumedOnce flag to true
+  video.addEventListener("seeked", () => {
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting seeked listener.`);
+      return;
+    }
+    console.log(`Instance ${latest_instance_id}: seeked event fired, setting resumedOnce to true.`);
+    resumedOnce = true;
+  });
+
   // Debug all events
   video_events.forEach((evt) => {
     video.addEventListener(evt, logEvents);
@@ -255,7 +265,7 @@ const observer = new MutationObserver(() => {
     // Valid video element found, attach listeners
     console.log(`Valid video element found for new videoId ${newVideoId}, attaching listeners.`);
     attachListeners(video);
-  }else{
+  } else {
     console.log(`Video not ready yet for new videoId ${newVideoId}`);
   }
 });
