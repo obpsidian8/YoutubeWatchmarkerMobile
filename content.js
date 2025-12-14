@@ -44,6 +44,7 @@ function attachListeners(video) {
   let lastSyncSave = 0;
   let timeUpdateEventCount = 0;
   let resumedOnce = false;
+  let videoPlaying = false;
   const saveDelayTimeout = 60; // Number of timeupdate events before saving (approx 15 seconds)
 
   //log videe element first
@@ -139,6 +140,7 @@ function attachListeners(video) {
       console.log(`Instance ${latest_instance_id}: Fetched videos for resuming ${videoId}:`, response.videos);
       const videos = response.videos || {};
       const saved = videos[videoId];
+      console.log(`Saved video data for ${videoId}:`, saved);
       console.log(`Instance ${latest_instance_id}: Resuming video ${videoId}:`, saved);
       if (saved && saved.currentTime) {
         console.log(`Instance ${latest_instance_id}: Found video ${videoId} at saved time: ${saved.currentTime}s`);
@@ -158,6 +160,8 @@ function attachListeners(video) {
             console.log(`Instance ${latest_instance_id}: Resumed video ${videoId} to ${saved.currentTime}s`);
           }, 1000); // delay ensures video is ready
           resumedOnce = true;
+        } else {
+          console.log(`Instance ${latest_instance_id}: Video ${videoId} has already been resumed once, skipping seek.`);
         }
       } else {
         console.log(`Instance ${latest_instance_id}: No saved progress found for video ${videoId}`);
@@ -195,13 +199,25 @@ function attachListeners(video) {
   // Resume logic: fetch saved progress and seek
   //Make sure video is playing before seeking
   video.addEventListener("playing", resumeVideo);
-
-  // Add listener for seeked event to set resumedOnce flag to true
+  video.addEventListener("playing", () => {
+    if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
+      console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting play listener.`);
+      return;
+    }
+    console.log(`Instance ${latest_instance_id}: playing event fired, setting videoPlaying to true.`);
+    videoPlaying = true;
+  });
+  // Add listener for seeking event to set resumedOnce flag to true
   video.addEventListener("seeked", () => {
     if (latest_instance_id !== GLOBAL_INSTANCE_ID) {
       console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting seeked listener.`);
       return;
     }
+    if (!videoPlaying) {
+      console.log(`Instance ${latest_instance_id}: seeked event fired but video is not playing. Not setting resumedOnce to true.`);
+      return;
+    }// Only set resumedOnce if video is playing
+
     console.log(`Instance ${latest_instance_id}: seeked event fired, setting resumedOnce to true.`);
     resumedOnce = true;
   });
@@ -234,6 +250,8 @@ function attachListeners(video) {
 const observer = new MutationObserver(() => {
   console.log("\n---------------------------------------------------------------------------------------------------");
   console.log("DOM mutation observed.");
+  // log the global tracking variables
+  console.log(`SAVED_VID_ID: ${SAVED_VID_ID}, LISTENER_ATTACHED: ${LISTENER_ATTACHED}, GLOBAL_INSTANCE_ID: ${GLOBAL_INSTANCE_ID}`);
   const video = document.querySelector("video") || document.querySelector("video.video-stream");
   // This detects all dom changes such as loading of nodes and tags. Also, the same vidoe element may persist across navigations.
   // So we need to check if we have already attached listeners for the current videoId.
@@ -261,11 +279,19 @@ const observer = new MutationObserver(() => {
   console.log(`DOM changed to NEW page with video element. ${newVideoId}.`);
   // Since window element may persist, remove old listeners first before attaching new ones. (timeupdate, playing)
   // Remove the within the attachListeners function
+  // There are some things we need to immediately do once we are on a new video page
+  // Need to set the SAVED_VID_ID to the new videoId, even if video element is not ready yet.
+  // TThis is because the script will still be running in within context/data from the previous video page and the new video will be saved a postion 0
+  // in the interval before the video element is ready, change GLOBAL_INSTANCE_ID to invalidate previous instance
+  SAVED_VID_ID = newVideoId;
+  GLOBAL_INSTANCE_ID = null;
+  LISTENER_ATTACHED = false;
   if (video && video.src && video.src.startsWith("blob:")) {
     // Valid video element found, attach listeners
     console.log(`Valid video element found for new videoId ${newVideoId}, attaching listeners.`);
     attachListeners(video);
   } else {
+    // If we dont change the the global variables above, the previous instance of the content script will continue to run and save progress for the previous video
     console.log(`Video not ready yet for new videoId ${newVideoId}`);
   }
 });
