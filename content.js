@@ -30,7 +30,7 @@ const video_events = [
   "loadedmetadata",
 ];
 
-special_force_save_events = ["pause", "seeked"];
+const special_force_save_events = ["pause", "seeked"];
 
 function attachListeners(video) {
   let latest_instance_id = Math.random().toString(36).substring(2, 10);
@@ -114,9 +114,15 @@ function attachListeners(video) {
       console.log(`Instance ${latest_instance_id} is outdated. Current Global Instance ID: ${GLOBAL_INSTANCE_ID}. Aborting forceSaveProgress.`);
       return;
     }
+    // if video has not started playing yet, do not save
+    if (!videoPlaying) {
+      console.log(`Instance ${latest_instance_id}: Video is not playing yet. Aborting forceSaveProgress.`);
+      return;
+    }
+
     // if timeSpentPlaying is less than 15 seconds, do not save
-    if (timeUpdateEventCount < saveDelayTimeout) return;
-    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, FORCE SAVE progress.`);
+    // if (timeUpdateEventCount < saveDelayTimeout) return;
+    
     const data = {
         videoId: new URLSearchParams(window.location.search).get("v"),
         currentTime: video.currentTime,
@@ -125,7 +131,7 @@ function attachListeners(video) {
         lastPlayed: new Date().toDateString(),
         timeLastPlayed: new Date().toISOString(),
       }
-
+    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, FORCE SAVE progress:`, data);
     chrome.runtime.sendMessage({
       type: "SAVE_SYNC",
       data: data,
