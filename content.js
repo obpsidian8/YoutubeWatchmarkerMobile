@@ -116,7 +116,7 @@ function attachListeners(video) {
     }
     // if timeSpentPlaying is less than 15 seconds, do not save
     if (timeUpdateEventCount < saveDelayTimeout) return;
-    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, saving progress to sync and local.`);
+    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, FORCE SAVE progress.`);
     const data = {
         videoId: new URLSearchParams(window.location.search).get("v"),
         currentTime: video.currentTime,
