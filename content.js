@@ -116,18 +116,24 @@ function attachListeners(video) {
     }
     // if timeSpentPlaying is less than 15 seconds, do not save
     if (timeUpdateEventCount < saveDelayTimeout) return;
-    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, saving progress (SYNC).`);
-
-    chrome.runtime.sendMessage({
-      type: "SAVE_SYNC",
-      data: {
+    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, saving progress to sync and local.`);
+    const data = {
         videoId: new URLSearchParams(window.location.search).get("v"),
         currentTime: video.currentTime,
         duration: video.duration,
         title: document.title,
         lastPlayed: new Date().toDateString(),
         timeLastPlayed: new Date().toISOString(),
-      },
+      }
+
+    chrome.runtime.sendMessage({
+      type: "SAVE_SYNC",
+      data: data,
+    });
+
+    chrome.runtime.sendMessage({
+      type: "SAVE_LOCAL",
+      data: data,
     });
   }
 
