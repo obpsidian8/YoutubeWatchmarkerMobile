@@ -98,13 +98,33 @@ function attachListeners(video) {
     if (now - lastLocalSave > 3000) {
       lastLocalSave = now;
       console.log(`Instance ${latest_instance_id} Saving progress locally:`, progress);
-      chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: progress });
+      try {
+        chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: progress }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+          } else {
+            console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+          }
+        });
+      } catch (e) {
+        console.error(`Instance ${latest_instance_id} Error sending SAVE_LOCAL message:`, e);
+      }
     }
 
     if (now - lastSyncSave > 120000) {
       lastSyncSave = now;
       console.log(`Instance ${latest_instance_id} Saving progress to sync:`, progress);
-      chrome.runtime.sendMessage({ type: "SAVE_SYNC", data: progress });
+      try {
+        chrome.runtime.sendMessage({ type: "SAVE_SYNC", data: progress }, response =>{
+          if (chrome.runtime.lastError) {
+            console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+          } else {
+            console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+          }
+        });
+      } catch (e) {
+        console.error(`Instance ${latest_instance_id} Error sending SAVE_SYNC message:`, e);
+      }
     }
   }
 
@@ -122,25 +142,39 @@ function attachListeners(video) {
 
     // if timeSpentPlaying is less than 15 seconds, do not save
     // if (timeUpdateEventCount < saveDelayTimeout) return;
-    
-    const data = {
-        videoId: new URLSearchParams(window.location.search).get("v"),
-        currentTime: video.currentTime,
-        duration: video.duration,
-        title: document.title,
-        lastPlayed: new Date().toDateString(),
-        timeLastPlayed: new Date().toISOString(),
-      }
-    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, FORCE SAVE progress:`, data);
-    chrome.runtime.sendMessage({
-      type: "SAVE_SYNC",
-      data: data,
-    });
 
-    chrome.runtime.sendMessage({
-      type: "SAVE_LOCAL",
-      data: data,
-    });
+    const data = {
+      videoId: new URLSearchParams(window.location.search).get("v"),
+      currentTime: video.currentTime,
+      duration: video.duration,
+      title: document.title,
+      lastPlayed: new Date().toDateString(),
+      timeLastPlayed: new Date().toISOString(),
+    };
+    console.log(`Instance ${latest_instance_id}: Event ${evt.type} fired, FORCE SAVE progress:`, data);
+    try {
+      chrome.runtime.sendMessage({ type: "SAVE_SYNC", data: data }, response =>{
+        if (chrome.runtime.lastError) {
+          console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+        } else {
+          console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+        }
+      });
+    } catch (e) {
+      console.error(`Instance ${latest_instance_id} Error sending FORCE SAVE_SYNC message:`, e);
+    }
+
+    try {
+      chrome.runtime.sendMessage({ type: "SAVE_LOCAL", data: data }, response =>{
+        if (chrome.runtime.lastError) {
+          console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+        } else {
+          console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+        }
+      });
+    } catch (e) {
+      console.error(`Instance ${latest_instance_id} Error sending FORCE SAVE_LOCAL message:`, e);
+    }
   }
 
   function resumeVideo() {
@@ -228,7 +262,7 @@ function attachListeners(video) {
     if (!videoPlaying) {
       console.log(`Instance ${latest_instance_id}: seeked event fired but video is not playing. Not setting resumedOnce to true.`);
       return;
-    }// Only set resumedOnce if video is playing
+    } // Only set resumedOnce if video is playing
 
     console.log(`Instance ${latest_instance_id}: seeked event fired, setting resumedOnce to true.`);
     resumedOnce = true;

@@ -1,5 +1,33 @@
 console.log("Loading background.js");
 
+chrome.runtime.onInstalled.addListener(() => {
+  console.log("Extension installed or reloaded. Reinjection starting...");
+  reinjectContentScripts();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  console.log("Browser restarted. Reinjection starting...");
+  reinjectContentScripts();
+});
+
+function reinjectContentScripts() {
+  chrome.tabs.query({ url: "*://www.youtube.com/*" }, (tabs) => {
+    for (const tab of tabs) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["content.js"]
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn("Injection failed:", chrome.runtime.lastError.message);
+        } else {
+          console.log(`Reinjected content.js into tab ${tab.id}`);
+        }
+      });
+    }
+  });
+}
+
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`Background received message type: ${message.type}`);
   const { videoId,duration, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
