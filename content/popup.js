@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderVideos(videos) {
     list.innerHTML = "";
-    Object.entries(videos).forEach(([id, { title, currentTime, lastPlayed, timeLastPlayed }]) => {
+    Object.entries(videos).forEach(([id, { title, duration, currentTime, lastPlayed, timeLastPlayed }]) => {
       //Convert time to hh:mm:ss format
       const formatTime = (seconds) => {
         const hrs = Math.floor(seconds / 3600);
@@ -13,21 +13,37 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
       };
 
+      const getTimeOnlyFromIsoString = (isoString) => {
+        // Convert ISO string to readable local date time
+        const date = new Date(isoString); //e,g 1/2/2026, 11:45:38 AM
+        // Return only the time portion HH:MM:SS AM/PM
+        return date.toLocaleTimeString();
+      };
+
+      const cleanTitle = (title) => {
+        // Remove parentheses and their contents, id digits, from beginning of the title eg (40) Title -> Title
+        // Remove "- Youtube" from end of title
+        return title
+          .replace(/^\s*\(.*\d+\)\s*/, "")
+          .replace(/- YouTube$/, "")
+          .trim();
+      };
+
       const container = document.createElement("div");
       container.id = id;
       container.className = "video_item";
 
       const titleEl = document.createElement("div");
-      titleEl.textContent = title;
+      titleEl.className = "video_title";
+      titleEl.textContent = cleanTitle(title);
 
       const timeEl = document.createElement("div");
-      timeEl.textContent = `Current Time: ${formatTime(currentTime)}`;
+      timeEl.className = "video_time";
+      timeEl.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
 
       const lastPlayedEl = document.createElement("div");
-      lastPlayedEl.textContent = `Last played: ${lastPlayed}`;
-
-      const timeLastPlayedEl = document.createElement("div");
-      timeLastPlayedEl.textContent = `Time last played: ${timeLastPlayed}`;
+      lastPlayedEl.className = "video_last_played";
+      lastPlayedEl.textContent = `Last played: ${lastPlayed} at ${getTimeOnlyFromIsoString(timeLastPlayed)}`;
 
       const imageElement = document.createElement("img");
       imageElement.src = "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg";
@@ -72,17 +88,32 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(titleEl);
       container.appendChild(timeEl);
       container.appendChild(lastPlayedEl);
-      container.appendChild(timeLastPlayedEl);
+
       container.appendChild(buttonRow);
     });
   }
 
+  // When pop is opened for the first time, fetch videos and render
   chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
     console.log("Fetched videos for rendering:", response.videos);
     const videos = response.videos || {};
     // Reverse the order of the vidoes so that the most recenlt added are at the top
     const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
     renderVideos(reversedVideos);
+  });
+
+  // While popup is open, listen for storage changes and update the list
+  chrome.storage.onChanged.addListener((changes, area) => {
+    console.log("Storage change detected in popup:", changes);
+    console.log("Area of change:", area);
+    if (!changes.videos) return;
+    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
+    console.log("Fetched videos for rendering:", response.videos);
+    const videos = response.videos || {};
+    // Reverse the order of the vidoes so that the most recenlt added are at the top
+    const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
+    renderVideos(reversedVideos);
+  });
   });
 
   // Search functionality
@@ -99,6 +130,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
-  
 });

@@ -20,12 +20,18 @@ h2 {
   margin: 0;
 }
 
+.video_title {
+  font-size: 12.5px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
 .video_item {
   border: 1px solid #ccc;
   border-radius: 6px;
   background: #fff;
   margin-bottom: 15px;
-  padding: 10px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -46,13 +52,14 @@ h2 {
 
 .delete_button {
   align-self: flex-end;
-  padding: 6px 12px;
+  padding: 3px 8px;
   font-size: 12px;
   background: #e74c3c;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: 2px;
 }
 
 .delete_button:hover {
@@ -62,14 +69,14 @@ h2 {
 
 .resume_button {
   align-self: flex-end;
-  padding: 6px 12px;
+  padding: 3px 8px;
   font-size: 12px;
   background: #2ecc71; /* green */
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 .resume_button:hover {
@@ -80,7 +87,7 @@ h2 {
   display: flex;
   justify-content: center; /* align buttons to the center */
   gap: 8px; /* space between buttons */
-  margin-top: 8px;
+  margin-top: 2px;
 }
 
 .search-container {
