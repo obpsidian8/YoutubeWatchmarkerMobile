@@ -104,14 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderVideosPage() {
-    //Clear existing content
-    root.innerHTML = "";
     // Fetch videos from background script
     chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
       console.log("Fetched videos for rendering:", response.videos);
       const videos = response.videos || {};
       // Reverse the order of the vidoes so that the most recenlt added are at the top
       const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
+      //Clear existing content
+      root.innerHTML = "";
       renderVideoTiles(reversedVideos);
     });
   }
@@ -157,7 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // When pop is opened for the first time, fetch videos and render
   renderVideosPage();
-
 
   // While popup is open, listen for storage changes and update the list
   chrome.storage.onChanged.addListener((changes, area) => {
