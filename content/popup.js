@@ -1,8 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Popup DOMContentLoaded");
-  const list = document.getElementById("video-list");
+  const root = document.getElementById("content-container");
 
-  function renderVideos(videos) {
+  function renderVideoTiles(videos) {
+    //create dive to hold video list
+    const videoListDiv = document.createElement("div");
+    videoListDiv.id = "video-list-div";
+    root.appendChild(videoListDiv);
+
+    //create video list and append to videoListDiv
+    const list = document.createElement("ul");
+    list.id = "video-list";
+    videoListDiv.appendChild(list);
+
     list.innerHTML = "";
     Object.entries(videos).forEach(([id, { title, duration, currentTime, lastPlayed, timeLastPlayed }]) => {
       //Convert time to hh:mm:ss format
@@ -93,27 +103,76 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function renderVideosPage() {
+    //Clear existing content
+    root.innerHTML = "";
+    // Fetch videos from background script
+    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
+      console.log("Fetched videos for rendering:", response.videos);
+      const videos = response.videos || {};
+      // Reverse the order of the vidoes so that the most recenlt added are at the top
+      const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
+      renderVideoTiles(reversedVideos);
+    });
+  }
+
+  function renderOptionsPage() {
+    // Clear existing content
+    root.innerHTML = "";
+    // Get root element (app div) and add options title. We will append content to this
+    const appDiv = document.getElementById("content-container");
+
+    //Create div to hold options page
+    const optionsDiv = document.createElement("div");
+    optionsDiv.id = "options-page";
+    appDiv.appendChild(optionsDiv);
+
+    // Create and append title to options page
+    const titleEl = document.createElement("h2");
+    titleEl.textContent = "Options";
+    optionsDiv.appendChild(titleEl);
+
+    //create delete all data button
+    const deleteAllButton = document.createElement("button");
+    deleteAllButton.type = "button";
+    deleteAllButton.className = "delete-all-button";
+    deleteAllButton.textContent = "Delete All Stored Data";
+    deleteAllButton.addEventListener("click", () => {
+      console.log("Delete All Stored Data button clicked");
+      chrome.runtime.sendMessage({ type: "CLEAR_DATA", data: {} });
+    });
+    optionsDiv.appendChild(deleteAllButton);
+
+    // Add back button to return to video list
+    const backButton = document.createElement("button");
+    backButton.textContent = "← Back";
+    backButton.id = "back-button";
+    backButton.className = "back-button";
+    backButton.addEventListener("click", () => {
+      // Call method to render video list again
+      renderVideosPage();
+    });
+    optionsDiv.appendChild(backButton);
+  }
+
   // When pop is opened for the first time, fetch videos and render
-  chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
-    console.log("Fetched videos for rendering:", response.videos);
-    const videos = response.videos || {};
-    // Reverse the order of the vidoes so that the most recenlt added are at the top
-    const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
-    renderVideos(reversedVideos);
-  });
+  renderVideosPage();
+
 
   // While popup is open, listen for storage changes and update the list
   chrome.storage.onChanged.addListener((changes, area) => {
     console.log("Storage change detected in popup:", changes);
     console.log("Area of change:", area);
     if (!changes.videos) return;
-    chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
-    console.log("Fetched videos for rendering:", response.videos);
-    const videos = response.videos || {};
-    // Reverse the order of the vidoes so that the most recenlt added are at the top
-    const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
-    renderVideos(reversedVideos);
+    renderVideosPage();
   });
+
+  //options-menu functionality
+  const optionsButton = document.getElementById("options-menu");
+  optionsButton.addEventListener("click", () => {
+    console.log("Options button clicked");
+    renderOptionsPage();
+    // Rerender page to show options page instead of video list
   });
 
   // Search functionality

@@ -7,16 +7,25 @@
   </head>
   <body>
     <h2>Saved YouTube Progress</h2>
-    <div id="app" class="app">
-      <div class="search-container" id="search-container-id">
-        <input id="searchbar" type="search" placeholder="Search" class="searchbar" />
-        <button id="options-menu" class="options-menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+    <div id="static-content" class="static-content">
+      <div id="nav-group" class="nav-group">
+        <div class="search-container" id="search-container-id">
+          <input id="searchbar" type="search" placeholder="Search" class="searchbar" />
+        </div>
+
+        <div id="options-container" class="options-container">
+          <button id="options-menu" class="options-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
       </div>
-      <ul id="video-list"></ul>
+    </div>
+
+    <div id="content-container" class="content-container">
+      <!-- Video list will be rendered here -->
+      <!-- options page will be rendered here -->
     </div>
 
     <script src="popup.js"></script>
