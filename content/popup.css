@@ -4,7 +4,7 @@ body {
   padding: 10px;
   background: #f9f9f9;
   color: #333;
-  width: 300px;
+  width: 400px;
 }
 
 h2 {
@@ -40,7 +40,7 @@ h2 {
 
 /* Thumbnail on the left */
 .video_item img {
-  width: 120px;
+  width: 180px;
   /* height: 90px; */
   object-fit: cover;
   border-radius: 4px;
