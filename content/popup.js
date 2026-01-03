@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const lastPlayedEl = document.createElement("div");
       lastPlayedEl.className = "video_last_played";
-      lastPlayedEl.textContent = `Last played: ${lastPlayed} at ${getTimeOnlyFromIsoString(timeLastPlayed)}`;
+      lastPlayedEl.textContent = `${lastPlayed}, ${getTimeOnlyFromIsoString(timeLastPlayed)}`;
 
       const imageElement = document.createElement("img");
       imageElement.src = "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg";
@@ -94,12 +94,17 @@ document.addEventListener("DOMContentLoaded", () => {
       buttonRow.appendChild(resumeButton);
 
       container.appendChild(imageElement);
-      container.appendChild(progressBar);
-      container.appendChild(titleEl);
-      container.appendChild(timeEl);
-      container.appendChild(lastPlayedEl);
 
-      container.appendChild(buttonRow);
+      // Crate video details div
+      const videoDetailsDiv = document.createElement("div");
+      videoDetailsDiv.className = "video_details";
+      container.appendChild(videoDetailsDiv);
+      
+      videoDetailsDiv.appendChild(titleEl);
+      videoDetailsDiv.appendChild(timeEl);
+      videoDetailsDiv.appendChild(lastPlayedEl);
+      videoDetailsDiv.appendChild(progressBar);
+      videoDetailsDiv.appendChild(buttonRow);
     });
   }
 
@@ -163,6 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Storage change detected in popup:", changes);
     console.log("Area of change:", area);
     if (!changes.videos) return;
+    // Check for options-page div, if it exists, do not rerender video list
+    if (document.getElementById("options-page")) return;
     renderVideosPage();
   });
 

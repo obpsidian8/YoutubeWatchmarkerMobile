@@ -1,7 +1,7 @@
 body {
   font-family: "Roboto", "Segoe UI", Helvetica, Arial, sans-serif;
   margin: 10px;
-  padding: 0;
+  padding: 10px;
   background: #f9f9f9;
   color: #333;
   width: 300px;
@@ -21,29 +21,45 @@ h2 {
 }
 
 .video_title {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: bold;
   margin-bottom: 2px;
 }
 
 .video_item {
+  display: flex;              /* horizontal layout */
+  gap: 8px;                  /* space between image and details */
+  padding: 4px;
   border: 1px solid #ccc;
   border-radius: 6px;
   background: #fff;
   margin-bottom: 15px;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+
+/* Thumbnail on the left */
 .video_item img {
-  width: 100%;
-  height: 100%;
+  width: 120px;
+  /* height: 90px; */
   object-fit: cover;
   border-radius: 4px;
 }
+
+
+/* Right side column */
+.video_details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;                    /* take remaining width */
+  gap: 6px;
+}
+
+/* Progress bar full width */
+.video_details .progress_bar {
+  width: 100%;
+}
+
 
 .video_item span {
   font-size: 13px;
@@ -52,14 +68,14 @@ h2 {
 
 .delete_button {
   align-self: flex-end;
-  padding: 3px 8px;
-  font-size: 12px;
+  padding: 2px 5px;
+  font-size: 10px;
   background: #e74c3c;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .delete_button:hover {
@@ -80,14 +96,14 @@ h2 {
 
 .resume_button {
   align-self: flex-end;
-  padding: 3px 8px;
-  font-size: 12px;
+  padding: 2px 5px;
+  font-size: 10px;
   background: #2ecc71; /* green */
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .resume_button:hover {
