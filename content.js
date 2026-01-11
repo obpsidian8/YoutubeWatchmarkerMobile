@@ -200,6 +200,13 @@ function attachListeners(video) {
           return;
         }
 
+        // Only attempt to resume if saved current time less then 99% of duration
+        if (saved.currentTime >= saved.duration * 0.99) {
+          console.log(`Instance ${latest_instance_id}: Saved current time ${saved.currentTime}s is >= 99% of duration ${saved.duration}s. Not seeking.`);
+          resumedOnce = true;
+          return;
+        }
+
         if (!resumedOnce) {
           setTimeout(() => {
             video.currentTime = saved.currentTime;
