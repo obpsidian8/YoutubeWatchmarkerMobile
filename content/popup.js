@@ -174,6 +174,12 @@ document.addEventListener("DOMContentLoaded", () => {
       renderVideosPage();
     });
     optionsDiv.appendChild(backButton);
+
+    //Add version info
+    const versionInfo = document.createElement("div");
+    versionInfo.id = "version-info";
+    versionInfo.textContent = `Version: ${chrome.runtime.getManifest().version}`;
+    optionsDiv.appendChild(versionInfo);
   }
 
   // When pop is opened for the first time, fetch videos and render
