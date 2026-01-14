@@ -72,8 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", () => {
         console.log(`Delete button clicked for video ${id}`);
-        chrome.runtime.sendMessage({ type: "DELETE_VIDEO", data: { videoId: id } });
-        container.remove(); // Remove the video item from the popup
+
+        if (confirm("Are you sure you want to continue?")) {
+          // OK was pressed → run your code
+          chrome.runtime.sendMessage({ type: "DELETE_VIDEO", data: { videoId: id } });
+          // container.remove(); // Remove the video item from the popup
+          renderVideosPage(); // Rerender the video list to reflect deletion
+        } else {
+          // Cancel was pressed → exit without running code
+          console.log("Cancelled.");
+        }
       });
 
       const resumeButton = document.createElement("button");
@@ -99,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const videoDetailsDiv = document.createElement("div");
       videoDetailsDiv.className = "video_details";
       container.appendChild(videoDetailsDiv);
-      
+
       videoDetailsDiv.appendChild(titleEl);
       videoDetailsDiv.appendChild(timeEl);
       videoDetailsDiv.appendChild(lastPlayedEl);
@@ -144,7 +152,15 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteAllButton.textContent = "Delete All Stored Data";
     deleteAllButton.addEventListener("click", () => {
       console.log("Delete All Stored Data button clicked");
-      chrome.runtime.sendMessage({ type: "CLEAR_DATA", data: {} });
+
+      if (confirm("Are you sure you want to continue?")) {
+        // OK was pressed → run your code
+        console.log("Running code...");
+        chrome.runtime.sendMessage({ type: "CLEAR_DATA", data: {} });
+      } else {
+        // Cancel was pressed → exit without running code
+        console.log("Cancelled.");
+      }
     });
     optionsDiv.appendChild(deleteAllButton);
 

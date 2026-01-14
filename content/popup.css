@@ -8,10 +8,21 @@ body {
 }
 
 h2 {
-  font-size: 16px;
+  font-family: Helvetica;
+  font-size: 14px;
   margin-bottom: 15px;
-  text-align: center;
+  text-align: left;
   color: #444;
+}
+
+#back-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #007bff;
+  margin-bottom: 10px;
+  padding: 0;
 }
 
 #video-list {
