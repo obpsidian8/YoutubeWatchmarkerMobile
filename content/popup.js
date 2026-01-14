@@ -72,16 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", () => {
         console.log(`Delete button clicked for video ${id}`);
-
-        if (confirm("Are you sure you want to continue?")) {
-          // OK was pressed → run your code
-          chrome.runtime.sendMessage({ type: "DELETE_VIDEO", data: { videoId: id } });
-          // container.remove(); // Remove the video item from the popup
-          renderVideosPage(); // Rerender the video list to reflect deletion
-        } else {
-          // Cancel was pressed → exit without running code
-          console.log("Cancelled.");
-        }
+        customConfirm("Are you sure?", function (result) {
+          if (result) {
+            console.log("OK pressed — run code");
+            chrome.runtime.sendMessage({ type: "DELETE_VIDEO", data: { videoId: id } });
+            // container.remove(); // Remove the video item from the popup
+            renderVideosPage(); // Rerender the video list to reflect deletion
+          } else {
+            console.log("Cancel pressed — exit");
+          }
+        });
       });
 
       const resumeButton = document.createElement("button");
@@ -152,15 +152,15 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteAllButton.textContent = "Delete All Stored Data";
     deleteAllButton.addEventListener("click", () => {
       console.log("Delete All Stored Data button clicked");
+      customConfirm("Are you sure?", function (result) {
+        if (result) {
+          console.log("OK pressed — run code");
+          chrome.runtime.sendMessage({ type: "CLEAR_DATA", data: {} });
+        } else {
+          console.log("Cancel pressed — exit");
+        }
+      });
 
-      if (confirm("Are you sure you want to continue?")) {
-        // OK was pressed → run your code
-        console.log("Running code...");
-        chrome.runtime.sendMessage({ type: "CLEAR_DATA", data: {} });
-      } else {
-        // Cancel was pressed → exit without running code
-        console.log("Cancelled.");
-      }
     });
     optionsDiv.appendChild(deleteAllButton);
 
@@ -180,6 +180,32 @@ document.addEventListener("DOMContentLoaded", () => {
     versionInfo.id = "version-info";
     versionInfo.textContent = `Version: ${chrome.runtime.getManifest().version}`;
     optionsDiv.appendChild(versionInfo);
+  }
+
+  function customConfirm(message, callback) {
+    const modal = document.getElementById("myConfirm");
+    const msg = document.getElementById("confirmMessage");
+    const okBtn = document.getElementById("confirmOk");
+    const cancelBtn = document.getElementById("confirmCancel");
+
+    msg.textContent = message;
+    modal.classList.remove("hidden");
+
+    const cleanup = () => {
+      modal.classList.add("hidden");
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+    };
+
+    okBtn.onclick = () => {
+      cleanup();
+      callback(true); // OK pressed
+    };
+
+    cancelBtn.onclick = () => {
+      cleanup();
+      callback(false); // Cancel pressed
+    };
   }
 
   // When pop is opened for the first time, fetch videos and render

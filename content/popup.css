@@ -198,3 +198,123 @@ progress {
   justify-content: center;
 }
 
+  .confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.confirm-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 320px;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Backdrop overlay */
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+
+  /* Smooth fade-in */
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+/* Hidden state */
+.confirm-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Dialog box */
+.confirm-box {
+  background: #ffffff;
+  padding: 20px 22px;
+  border-radius: 12px;
+  width: 85%;
+  max-width: 340px;
+
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+
+  /* Slide-up animation */
+  transform: translateY(0);
+  transition: transform 0.25s ease;
+}
+
+.confirm-backdrop.hidden .confirm-box {
+  transform: translateY(20px);
+}
+
+/* Message text */
+#confirmMessage {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* Button row */
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Base button style */
+.buttons button {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+/* Cancel button */
+#confirmCancel {
+  background: #e5e5e5;
+  color: #333;
+}
+
+#confirmCancel:active {
+  background: #d4d4d4;
+  transform: scale(0.97);
+}
+
+/* OK button */
+#confirmOk {
+  background: #ff4800;
+  color: white;
+}
+
+#confirmOk:active {
+  background: #0066d6;
+  transform: scale(0.97);
+}
