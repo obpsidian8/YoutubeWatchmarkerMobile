@@ -13,24 +13,26 @@ chrome.runtime.onStartup.addListener(() => {
 function reinjectContentScripts() {
   chrome.tabs.query({ url: "*://www.youtube.com/*" }, (tabs) => {
     for (const tab of tabs) {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["content.js"]
-      }, () => {
-        if (chrome.runtime.lastError) {
-          console.warn("Injection failed:", chrome.runtime.lastError.message);
-        } else {
-          console.log(`Reinjected content.js into tab ${tab.id}`);
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tab.id },
+          files: ["content.js"],
+        },
+        () => {
+          if (chrome.runtime.lastError) {
+            console.warn("Injection failed:", chrome.runtime.lastError.message);
+          } else {
+            console.log(`Reinjected content.js into tab ${tab.id}`);
+          }
         }
-      });
+      );
     }
   });
 }
 
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`Background received message type: ${message.type}`);
-  const { videoId,duration, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
+  const { videoId, duration, currentTime, title, lastPlayed, timeLastPlayed } = message.data;
 
   if (message.type === "SAVE_LOCAL") {
     console.log("Saving locally:", message.data);
@@ -75,6 +77,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 
+  if (message.type === "IMPORT_VIDEOS") {
+      const videos = message.data.videos;
+      // Fetch existing videos to merge
+      existing_videos = fetchVideos().then((existing_videos) => {
+        const merged_videos = { ...existing_videos, ...videos };
+        chrome.storage.local.set({ videos: merged_videos });
+        // chrome.storage.sync.set({ videos: merged_videos });
+        console.log("Imported videos into storage:", merged_videos);
+      });
+      // Send response back to popup
+      sendResponse({ status: "IMPORT_SAVED" });
+      return true; // Indicate that we will send a response asynchronously
+    }
+
   async function fetchVideos() {
     const syncResult = await chrome.storage.sync.get(["videos"]);
     console.log("Videos fetched from sync storage:", syncResult.videos);
@@ -109,7 +125,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     });
   }
-
-
-
 });

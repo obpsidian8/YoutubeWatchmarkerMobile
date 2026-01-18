@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderVideosPage() {
+    setOptionsButtonNormalFunction();
     // Fetch videos from background script
     chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
       console.log("Fetched videos for rendering:", response.videos);
@@ -130,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderOptionsPage() {
+    setOptionsButtonBackFunction();
     // Clear existing content
     root.innerHTML = "";
     // Get root element (app div) and add options title. We will append content to this
@@ -152,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteAllButton.textContent = "Delete All Stored Data";
     deleteAllButton.addEventListener("click", () => {
       console.log("Delete All Stored Data button clicked");
+      // Pass message and function to run(if true) into custom confirm
       customConfirm("Are you sure?", function (result) {
         if (result) {
           console.log("OK pressed — run code");
@@ -160,9 +163,79 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("Cancel pressed — exit");
         }
       });
-
     });
     optionsDiv.appendChild(deleteAllButton);
+    // ======================= End delete all data button
+
+    // Create Download Data Button
+    const downloadDataButton = document.createElement("button");
+    downloadDataButton.type = "button";
+    downloadDataButton.className = "download-data-button";
+    downloadDataButton.textContent = "Download Stored Data";
+    downloadDataButton.addEventListener("click", () => {
+      console.log("Download Stored Data button clicked");
+      chrome.runtime.sendMessage({ type: "FETCH_VIDEOS", data: {} }, (response) => {
+        const dataStr = JSON.stringify(response.videos, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+
+        const a = document.createElement("a");
+        a.download = "stored_videos_data.json";
+        a.href = URL.createObjectURL(blob);
+        a.textContent = "Download stored_videos_data.json";
+        a.dataset.downloadurl = ["application/json", a.download, a.href].join(":");
+        document.body.appendChild(a);
+
+        a.click();
+
+        // Clean up
+        URL.revokeObjectURL(a.href); // <-- release memory
+        document.body.removeChild(a); // <-- remove temporary element
+      });
+    });
+    optionsDiv.appendChild(downloadDataButton);
+    // ======================= End Download Data Button
+
+    // Create Import Data Button
+    const importDataButton = document.createElement("button");
+    importDataButton.type = "button";
+    importDataButton.className = "import-data-button";
+    importDataButton.textContent = "Import Saved Data";
+    importDataButton.addEventListener("click", () => {
+      console.log("Import Stored Data button clicked");
+      // Create file input element
+      const fileInput = document.createElement("input");
+
+      // Configure it to accept JSON files
+      fileInput.type = "file"; // Set file input type
+      fileInput.accept = ".json,application/json";
+
+      // Listen for file selection
+      fileInput.addEventListener("change", (event) => {
+        // Get the selected file
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        // When file is read, parse JSON and send to background script
+        reader.onload = (e) => {
+          try {
+            const importedData = JSON.parse(e.target.result);
+            chrome.runtime.sendMessage({ type: "IMPORT_VIDEOS", data: { videos: importedData } }, (response) => {
+              console.log("Import response:", response);
+              // Display confirmation to user
+              customConfirm("Import successful!", function (result) {
+                // Do nothing on OK
+              });
+            });
+          } catch (error) {
+            console.error("Error parsing imported JSON:", error);
+          }
+        };
+        reader.readAsText(file);
+      });
+      fileInput.click();
+    });
+    optionsDiv.appendChild(importDataButton);
+    // ======================= End Import Data Button
 
     // Add back button to return to video list
     const backButton = document.createElement("button");
@@ -183,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function customConfirm(message, callback) {
+    // Get modal elements
     const modal = document.getElementById("myConfirm");
     const msg = document.getElementById("confirmMessage");
     const okBtn = document.getElementById("confirmOk");
@@ -191,6 +265,19 @@ document.addEventListener("DOMContentLoaded", () => {
     msg.textContent = message;
     modal.classList.remove("hidden");
 
+    //Special case: if message is "Import successful!", hide cancel button
+    if (message === "Import successful!") {
+      cancelBtn.style.display = "none";
+      // Change okBtn text to "Close"
+      okBtn.textContent = "Close";
+
+      //Change okBtn color to default
+      okBtn.style.background = "#39753e";
+    } else {
+      cancelBtn.style.display = "inline-block";
+    }
+
+    // Cleanup function to remove event listeners and hide modal
     const cleanup = () => {
       modal.classList.add("hidden");
       okBtn.onclick = null;
@@ -199,17 +286,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     okBtn.onclick = () => {
       cleanup();
+      // Call the callback with true
       callback(true); // OK pressed
     };
 
     cancelBtn.onclick = () => {
       cleanup();
+      // Call the callback with false
       callback(false); // Cancel pressed
     };
   }
-
-  // When pop is opened for the first time, fetch videos and render
-  renderVideosPage();
 
   // While popup is open, listen for storage changes and update the list
   chrome.storage.onChanged.addListener((changes, area) => {
@@ -221,13 +307,37 @@ document.addEventListener("DOMContentLoaded", () => {
     renderVideosPage();
   });
 
-  //options-menu functionality
-  const optionsButton = document.getElementById("options-menu");
-  optionsButton.addEventListener("click", () => {
-    console.log("Options button clicked");
-    renderOptionsPage();
-    // Rerender page to show options page instead of video list
-  });
+  function setOptionsButtonNormalFunction() {
+    let optionsButton = document.getElementById("options-menu");
+    optionsButton.classList.remove("back-icon");
+    // Remove existing event listeners by cloning
+    let newOptionsButton = optionsButton.cloneNode(true);
+    // Add back the three span tags inside the button
+    newOptionsButton.innerHTML = `<span class="bar1"></span><span class="bar2"></span><span class="bar3"></span>`;
+    optionsButton.parentNode.replaceChild(newOptionsButton, optionsButton);
+    newOptionsButton.addEventListener("click", () => {
+      console.log("Options button clicked");
+      // Rerender page to show options page instead of video list
+      renderOptionsPage();
+    });
+  }
+
+  // ========================== setOptionsButtonBackFunction
+  function setOptionsButtonBackFunction() {
+    let optionsButton = document.getElementById("options-menu");
+    // Remove existing event listeners by cloning
+    let newOptionsButton = optionsButton.cloneNode(true);
+    // Remove two of the three the empty span tags inside the button
+    newOptionsButton.classList.add("back-icon");
+
+    optionsButton.parentNode.replaceChild(newOptionsButton, optionsButton);
+    newOptionsButton.addEventListener("click", () => {
+      console.log("Back to videos button clicked");
+      // Rerender video list
+      renderVideosPage();
+    });
+  }
+  // ======================= End setOptionsButtonBackFunction
 
   // Search functionality
   const searchBar = document.getElementById("searchbar");
@@ -243,4 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // When pop is opened for the first time, fetch videos and render
+  renderVideosPage();
 });

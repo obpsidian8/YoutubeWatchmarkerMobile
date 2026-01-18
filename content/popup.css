@@ -21,7 +21,7 @@ h2 {
   font-size: 14px;
   cursor: pointer;
   color: #007bff;
-  margin-bottom: 10px;
+  margin: 10px;
   padding: 0;
 }
 
@@ -38,16 +38,15 @@ h2 {
 }
 
 .video_item {
-  display: flex;              /* horizontal layout */
-  gap: 8px;                  /* space between image and details */
+  display: flex; /* horizontal layout */
+  gap: 8px; /* space between image and details */
   padding: 4px;
   border: 1px solid #ccc;
   border-radius: 6px;
   background: #fff;
   margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 
 /* Thumbnail on the left */
 .video_item img {
@@ -57,12 +56,11 @@ h2 {
   border-radius: 4px;
 }
 
-
 /* Right side column */
 .video_details {
   display: flex;
   flex-direction: column;
-  flex: 1;                    /* take remaining width */
+  flex: 1; /* take remaining width */
   gap: 6px;
 }
 
@@ -70,7 +68,6 @@ h2 {
 .video_details .progress_bar {
   width: 100%;
 }
-
 
 .video_item span {
   font-size: 13px;
@@ -93,16 +90,24 @@ h2 {
   background: #c0392b;
 }
 
-.delete-all-button{
-  align-self: flex-end;
-  padding: 3px 8px;
-  font-size: 12px;
+.delete-all-button {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 12px;
+
   background: #e74c3c;
-  color: #fff;
+  color: white;
+
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+
   cursor: pointer;
-  margin: 10px;
+  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .resume_button {
@@ -130,16 +135,15 @@ h2 {
 
 /* Search container should expand */
 .search-container {
-  flex: 1;                  /* take all remaining space */
+  flex: 1; /* take all remaining space */
   display: flex;
 }
-
 
 /* NAV GROUP: search bar + hamburger menu */
 #nav-group {
   display: flex;
-  align-items: center;      /* vertically center both elements */
-  gap: 8px;                 /* space between search bar and menu */
+  align-items: center; /* vertically center both elements */
+  gap: 8px; /* space between search bar and menu */
   margin-bottom: 10px;
 }
 
@@ -147,7 +151,7 @@ h2 {
   flex: 1;
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 14px ;
+  border-radius: 14px;
   font-size: 14px;
 }
 
@@ -189,6 +193,7 @@ progress {
   height: 3px;
   background-color: #333;
   border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 /* Hamburger menu container */
@@ -198,10 +203,23 @@ progress {
   justify-content: center;
 }
 
-  .confirm-backdrop {
+/* --- Back icon state --- */
+.options-menu.back-icon span:nth-child(2) {
+  opacity: 0; /* Hide the middle bar */
+}
+
+.options-menu.back-icon span:nth-child(1) {
+  transform: translateY(2px) rotate(-45deg);
+}
+
+.options-menu.back-icon span:nth-child(3) {
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.confirm-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,5 +334,74 @@ progress {
 
 #confirmOk:active {
   background: #0066d6;
+  transform: scale(0.97);
+}
+
+.download-data-button {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 12px;
+
+  background: #657383;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover (desktop only, mobile ignores it) */
+.download-data-button:hover {
+  background: #688f74;
+}
+
+/* Pressed state */
+.download-data-button:active {
+  background: #688f74;
+  transform: scale(0.97);
+}
+
+/* Optional: disabled state */
+.download-data-button:disabled {
+  background: #9bbce0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.import-data-button {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 12px;
+
+  background: #657383;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.import-data-button:hover {
+  background: #688f74;
+}
+
+/* Pressed state */
+.import-data-button:active {
+  background: #688f74;
   transform: scale(0.97);
 }
