@@ -64,10 +64,7 @@ h2 {
   gap: 6px;
 }
 
-/* Progress bar full width */
-.video_details .progress_bar {
-  width: 100%;
-}
+
 
 .video_item span {
   font-size: 13px;
@@ -161,19 +158,20 @@ progress {
 }
 
 .progress_bar {
-  -webkit-appearance: none;
-  appearance: none;
   width: 100%;
   height: 10px;
-  border-radius: 5px;
+  border: 0.1px solid rgb(120, 116, 139);      /* thin border */
+  border-radius: 4px;
+  background-color: transparent;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .progress_bar::-webkit-progress-bar {
-  background-color: #eee;
+  background-color: transparent;
 }
 .progress_bar::-webkit-progress-value {
-  background-color: #36b132;
+  background-color: #7ac278;
 }
 
 .options-menu {
