@@ -403,3 +403,34 @@ progress {
   background: #688f74;
   transform: scale(0.97);
 }
+
+
+/* Container must be positioned for the badge to anchor correctly */
+.options-container {
+  position: relative;
+}
+
+/* The red bubble */
+.options-menu::after {
+  content: attr(data-count);
+  position: absolute;
+  top: -15px;
+  right: -15px;
+
+  background: #e53935;
+  color: white;
+
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1;
+
+  padding: 3px 6px;
+  border-radius: 12px;
+
+  display: none; /* hidden by default */
+}
+
+/* Show bubble only when count > 0 */
+.options-menu[data-count]:not([data-count="0"])::after {
+  display: inline-block;
+}

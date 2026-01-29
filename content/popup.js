@@ -126,8 +126,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const reversedVideos = Object.fromEntries(Object.entries(videos).reverse());
       //Clear existing content
       root.innerHTML = "";
+      updateVideoCountBubble(Object.keys(videos).length);
       renderVideoTiles(reversedVideos);
     });
+  }
+
+  function updateVideoCountBubble(count) {
+    const btn = document.getElementById("options-menu");
+    btn.setAttribute("data-count", count);
   }
 
   function renderOptionsPage() {
@@ -162,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           console.log("Cancel pressed — exit");
         }
+        updateVideoCountBubble(0);
       });
     });
     optionsDiv.appendChild(deleteAllButton);
