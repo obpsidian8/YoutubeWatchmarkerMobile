@@ -374,6 +374,46 @@ progress {
   box-shadow: none;
 }
 
+.sign-in-button {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 12px;
+
+  background: #657383;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover (desktop only, mobile ignores it) */
+.sign-in-button:hover {
+  background: #688f74;
+}
+
+/* Pressed state */
+.sign-in-button:active {
+  background: #688f74;
+  transform: scale(0.97);
+}
+
+/* Optional: disabled state */
+.sign-in-button:disabled {
+  background: #9bbce0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
 .import-data-button {
   width: 100%;
   padding: 12px 16px;

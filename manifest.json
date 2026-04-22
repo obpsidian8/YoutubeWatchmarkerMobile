@@ -23,11 +23,18 @@
    "manifest_version": 3,
    "name": "YouTube Progress Saver",
    "description": "Save and view YouTube video progress across devices.",
-   "permissions": ["storage", "tabs", "scripting"],
+   "permissions": ["storage", "tabs", "scripting", "identity"],
    "host_permissions": [
     "*://*.youtube.com/*",
-    "*://m.youtube.com/*"
+    "*://m.youtube.com/*",
+   "https://www.googleapis.com/*"
    ],
-   "version": "2.8"
+   "oauth2": {
+    "client_id": "644683038468-ov9srral9clec4ibqvhk2v6q6uj8a2th.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.appdata"
+    ]
+  },
+   "version": "2.9"
 }
 
