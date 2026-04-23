@@ -38,10 +38,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Saving locally:", message.data);
     // Will not sasve if videoId is undefined
     if (!videoId) return;
-    chrome.storage.local.get(["videos"], (result) => {
+    chrome.storage.local.get(["videos"], async (result) => {
       const videos = result.videos || {};
       videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
-      chrome.storage.local.set({ videos });
+      chrome.storage.local.set({ videos: videos });
+      
+      // Try to upload to Google Drive if token is available
+      try {
+        const token = await getOrRefreshGoogleDriveAccessToken();
+        const fileId = await uploadToGoogleDrive(token, videos);
+        //When we save to Google Drive, we save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
+        chrome.storage.local.set({ googleDriveFileId: fileId }); 
+        console.log("Video uploaded to Google Drive (local save)");
+      } catch (error) {
+        console.error("Failed to upload to Google Drive:", error);
+        // Continue anyway, local save is already done
+      }
     });
   }
 
@@ -49,10 +61,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Saving to sync:", message.data);
     // Will not sasve if videoId is undefined
     if (!videoId) return;
-    chrome.storage.sync.get(["videos"], (result) => {
+    chrome.storage.sync.get(["videos"], async (result) => {
       const videos = result.videos || {};
       videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
-      chrome.storage.sync.set({ videos });
+      chrome.storage.sync.set({ videos: videos });
+      
+      // Try to upload to Google Drive if token is available
+      try {
+        const token = await getOrRefreshGoogleDriveAccessToken();
+        const fileId = await uploadToGoogleDrive(token, videos);
+        //When we save to Google Drive, we save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
+        chrome.storage.local.set({ googleDriveFileId: fileId });
+        console.log("Video uploaded to Google Drive (sync save)");
+      } catch (error) {
+        console.error("Failed to upload to Google Drive:", error);
+        // Continue anyway, sync save is already done
+      }
     });
   }
 
@@ -60,6 +84,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Clearing all stored data.");
     chrome.storage.local.remove(["videos"]);
     chrome.storage.sync.remove(["videos"]);
+    // We also want to delete the file from Google Drive when clearing data, so we will trigger an upload to Google Drive with empty videos after clearing local and sync storage
+    chrome.storage.local.get(["videos"], async (result) => {
+      const videos = {}; // Empty videos to overwrite existing data on Google Drive
+      try {
+        const token = await getOrRefreshGoogleDriveAccessToken();
+        const fileId = await uploadToGoogleDrive(token, videos);
+      } catch (error) {
+        console.error("Failed to upload cleared videos to Google Drive:", error);
+      }
+    });
   }
 
   if (message.type === "DELETE_VIDEO") {
@@ -67,13 +101,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.storage.sync.get(["videos"], (result) => {
       const videos = result.videos || {};
       delete videos[videoId];
-      chrome.storage.sync.set({ videos });
+      chrome.storage.sync.set({ videos: videos });
     });
     // Also delete from local storage
     chrome.storage.local.get(["videos"], (result) => {
       const videos = result.videos || {};
       delete videos[videoId];
-      chrome.storage.local.set({ videos });
+      chrome.storage.local.set({ videos: videos });
+    });
+    //We want the delete to show up in google drive too so we will trigger an upload to Google Drive with the updated videos after deletion
+    chrome.storage.local.get(["videos"], async (result) => {
+      const videos = result.videos || {};
+      try {
+        const token = await getOrRefreshGoogleDriveAccessToken();
+        const fileId = await uploadToGoogleDrive(token, videos);
+      } catch (error) {
+        console.error("Failed to upload updated videos to Google Drive:", error);
+      }
     });
   }
 
@@ -85,75 +129,107 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.storage.local.set({ videos: merged_videos });
       // chrome.storage.sync.set({ videos: merged_videos });
       console.log("Imported videos into storage:", merged_videos);
+
+      // Try to upload merged videos to Google Drive if token is available
+      getOrRefreshGoogleDriveAccessToken()
+        .then((token) => uploadToGoogleDrive(token, merged_videos))
+        .then((fileId) => {
+          // Save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
+          chrome.storage.local.set({ googleDriveFileId: fileId });
+          console.log("Merged videos uploaded to Google Drive (import)");
+        })
+        .catch((error) => {
+          console.error("Failed to upload merged videos to Google Drive:", error);
+          // Continue anyway, local save is already done
+        });
     });
     // Send response back to popup
     sendResponse({ status: "IMPORT_SAVED" });
     return true; // Indicate that we will send a response asynchronously
   }
 
-  if (message.type === "SET_API_KEY") {
-    console.log("Setting API Key in background:", message.data.apiKey);
-    chrome.storage.local.set({ googleDriveApiKey: message.data.apiKey }, () => {
-      sendResponse({ success: true });
-    });
-    return true; // Indicate that we will send a response asynchronously
-  }
-
-  if (message.type === "GET_API_KEY") {
-    console.log("Getting API Key from background");
-    chrome.storage.local.get("googleDriveApiKey", (result) => {
-      console.log("API Key fetched from storage:", result.googleDriveApiKey);
-      sendResponse({ apiKeyExists: !!result.googleDriveApiKey });
-    });
-    return true; // Indicate that we will send a response asynchronously
-  }
-
-  if (message.type === "SIGN_IN_TO_GOOGLE_DRIVE") {
-  console.log("Signing in to Google Drive and syncing data");
-  
-  // Get OAuth access token using web auth flow
-  const clientId = "644683038468-ov9srral9clec4ibqvhk2v6q6uj8a2th.apps.googleusercontent.com";
-  const redirectUrl = chrome.identity.getRedirectURL();
-  const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-  
-  authUrl.searchParams.append("client_id", clientId);
-  authUrl.searchParams.append("response_type", "token");
-  authUrl.searchParams.append("redirect_uri", redirectUrl);
-  authUrl.searchParams.append("scope", "https://www.googleapis.com/auth/drive.appdata");
-  
-  chrome.identity.launchWebAuthFlow(
-    { url: authUrl.toString(), interactive: true },
-    (responseUrl) => {
-      if (chrome.runtime.lastError) {
-        console.error("Auth error:", chrome.runtime.lastError);
-        sendResponse({ success: false, error: chrome.runtime.lastError.message });
-        return;
-      }
-      
-      const url = new URL(responseUrl);
-      const token = url.hash.substring(1).split("&").find(part => part.startsWith("access_token="))?.split("=")[1];
-      
-      if (!token) {
-        sendResponse({ success: false, error: "No access token received" });
-        return;
-      }
-      
-      fetchVideos(token).then((videos) => {
-        uploadToGoogleDrive(token, videos)
-          .then((fileId) => {
-            console.log("Data successfully synced to Google Drive");
-            sendResponse({ success: true, fileId: fileId });
-          })
-          .catch((error) => {
-            console.error("Upload error:", error);
-            sendResponse({ success: false, error: error.message });
-          });
+  if (message.type === "SYNC_WITH_GOOGLE_DRIVE") {
+    console.log("Signing in to Google Drive and syncing data");
+    
+    getOrRefreshGoogleDriveAccessToken()
+      .then(async (token) => {
+        const videos = await fetchVideos(token); // Will fetch merged videos from all sources including Google Drive to ensure we have the latest data before syncing back
+        // Saved newly merged videos back to local storage to ensure we have the latest data locally as well
+        console.log("Saving merged videos(including Google Drive) to local storage before syncing to Google Drive:", videos);
+        chrome.storage.local.set({ videos: videos });
+        
+        const fileId = await uploadToGoogleDrive(token, videos);
+        // Save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
+        chrome.storage.local.set({ googleDriveFileId: fileId });
+        console.log("Data successfully synced to Google Drive");
+        sendResponse({ success: true, fileId: fileId });
+      })
+      .catch((error) => {
+        console.error("Upload error:", error);
+        sendResponse({ success: false, error: error.message });
       });
+    
+    return true;
+  }
+
+  async function getOrRefreshGoogleDriveAccessToken() {
+    // Check if token exists in storage
+    const result = await chrome.storage.local.get(["googleDriveToken", "googleDriveTokenTimestamp"]);
+    const token = result.googleDriveToken;
+    const timestamp = result.googleDriveTokenTimestamp;
+    
+    // Token expiry window (in milliseconds) - Google tokens typically last 1 hour
+    const TOKEN_EXPIRY_WINDOW = 60 * 60 * 1000; // 1 hour
+    
+    // Check if token is still valid
+    if (token && timestamp) {
+      const now = Date.now();
+      if (now - timestamp < TOKEN_EXPIRY_WINDOW) {
+        console.log("Using cached Google Drive token");
+        return token;
+      }
     }
-  );
-  
-  return true;
-}
+    
+    // Token is missing or expired, perform auth flow
+    console.log("Token missing or expired, requesting new token");
+    const clientId = "644683038468-ov9srral9clec4ibqvhk2v6q6uj8a2th.apps.googleusercontent.com";
+    const redirectUrl = chrome.identity.getRedirectURL();
+    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    
+    authUrl.searchParams.append("client_id", clientId);
+    authUrl.searchParams.append("response_type", "token");
+    authUrl.searchParams.append("redirect_uri", redirectUrl);
+    authUrl.searchParams.append("scope", "https://www.googleapis.com/auth/drive.appdata");
+    
+    return new Promise((resolve, reject) => {
+      chrome.identity.launchWebAuthFlow(
+        { url: authUrl.toString(), interactive: true },
+        (responseUrl) => {
+          if (chrome.runtime.lastError) {
+            console.error("Auth error:", chrome.runtime.lastError);
+            reject(chrome.runtime.lastError);
+            return;
+          }
+          
+          const url = new URL(responseUrl);
+          const newToken = url.hash.substring(1).split("&").find(part => part.startsWith("access_token="))?.split("=")[1];
+          
+          if (!newToken) {
+            reject(new Error("No access token received"));
+            return;
+          }
+          
+          // Save token and timestamp to storage
+          chrome.storage.local.set({
+            googleDriveToken: newToken,
+            googleDriveTokenTimestamp: Date.now()
+          });
+          
+          resolve(newToken);
+        }
+      );
+    });
+  }
 
   // chceck signed in status
   if (message.type === "GET_SIGNED_IN_STATUS") {
@@ -168,6 +244,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   async function fetchVideos(accessToken = null) {
+    // Fetch videos from 3 sources: sync storage, local storage, and Google Drive (if access token is provided)
     const syncResult = await chrome.storage.sync.get(["videos"]);
     console.log("Videos fetched from sync storage:", syncResult.videos);
     const localResult = await chrome.storage.local.get(["videos"]);
@@ -183,6 +260,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log("Videos fetched from Google Drive:", driveVideos);
           // Merge with existing videos (Google Drive data takes precedence)
           mergedVideos = { ...mergedVideos, ...driveVideos };
+        }
+        else{
+          console.log("No videos found on Google Drive");
         }
       } catch (error) {
         console.error("Error fetching from Google Drive:", error);
@@ -203,15 +283,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   async function downloadFromGoogleDrive(accessToken) {
-    // Get the file ID that was stored when we synced
-    const result = await chrome.storage.local.get("googleDriveFileId");
-    const fileId = result.googleDriveFileId;
+    const fileName = "youtube-watchmarker-data.json";
+    let fileId = null;
     
+    // Try to get the file ID from local storage first
+    const result = await chrome.storage.local.get("googleDriveFileId");
+    fileId = result.googleDriveFileId;
+    
+    // If no fileId in storage, try to find it by name (fallback for new devices)
     if (!fileId) {
-      console.log("No Google Drive file ID found");
-      return {};
+      console.log("File ID not found in storage, searching by file name");
+      try {
+        const listResponse = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=name='${fileName}' and trashed=false&spaces=appDataFolder&fields=files(id)`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+        
+        if (!listResponse.ok) {
+          throw new Error(`Failed to search for file: ${listResponse.status}`);
+        }
+        
+        const listData = await listResponse.json();
+        const foundFile = listData.files && listData.files.length > 0 ? listData.files[0] : null;
+        
+        if (foundFile) {
+          fileId = foundFile.id;
+          // Save the file ID to local storage for future use
+          chrome.storage.local.set({ googleDriveFileId: fileId });
+          console.log("Found file by name, saved file ID to local storage");
+        } else {
+          console.log("No file found on Google Drive");
+          return {};
+        }
+      } catch (error) {
+        console.error("Error searching for file by name:", error);
+        throw error;
+      }
     }
     
+    // Now download the file using the fileId
     try {
       const response = await fetch(
         `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
@@ -240,7 +355,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const fileName = "youtube-watchmarker-data.json";
     const fileContent = JSON.stringify(videos, null, 2);
     
-    // Check if file already exists in app data folder
+    // Check if file already exists in app data folder. 
+    // We are checking by name because we want to reuse the same file each time to avoid cluttering user's Google Drive with multiple files. 
+    // If the file exists, we will update it. If not, we will create a new file.
     const listResponse = await fetch(
       `https://www.googleapis.com/drive/v3/files?q=name='${fileName}' and trashed=false&spaces=appDataFolder&fields=files(id)`,
       {
@@ -308,11 +425,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       
       const result = await createResponse.json();
-      return result.id;
+      return result.id; //This is the file ID of the newly created file
     }
   }
 
   if (message.type === "FETCH_VIDEOS") {
+    // Don't block popup load by requesting auth token
+    // Just fetch from local/sync storage without Google Drive
     fetchVideos().then((videos) => sendResponse({ videos }));
     return true; // Indicate that we will send a response asynchronously
   }

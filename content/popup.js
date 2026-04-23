@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Create progress bar
       const progressBar = document.createElement("progress");
       // Express progress bar value as a percent of duration
-      console.log(`Video ${id} duration: ${videos[id].duration}, currentTime: ${currentTime}`);
+      // console.log(`Video ${id} duration: ${videos[id].duration}, currentTime: ${currentTime}`);
       progressBar.value = (currentTime / (videos[id].duration || 1)) * 100; // Avoid division by zero
       progressBar.max = 100;
       progressBar.className = "progress_bar";
@@ -153,73 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
     titleEl.textContent = "Options";
     optionsDiv.appendChild(titleEl);
 
-    // ========================== API Key Section ==========================
-    // Create API Key input section
-    const apiKeySection = document.createElement("div");
-    apiKeySection.id = "api-key-section";
-    apiKeySection.style.marginBottom = "20px";
-    apiKeySection.style.padding = "10px";
-    apiKeySection.style.border = "1px solid #ccc";
-    apiKeySection.style.borderRadius = "5px";
-
-    const apiKeyLabel = document.createElement("label");
-    apiKeyLabel.htmlFor = "api-key-input";
-    apiKeyLabel.textContent = "Google Drive API Key: ";
-    apiKeyLabel.style.display = "block";
-    apiKeyLabel.style.marginBottom = "5px";
-    apiKeyLabel.style.fontWeight = "bold";
-
-    const apiKeyInput = document.createElement("input");
-    apiKeyInput.id = "api-key-input";
-    apiKeyInput.type = "password";
-    apiKeyInput.placeholder = "Enter your Google Drive API Key";
-    apiKeyInput.style.width = "100%";
-    apiKeyInput.style.padding = "8px";
-    apiKeyInput.style.marginBottom = "10px";
-    apiKeyInput.style.boxSizing = "border-box";
-
-    const saveApiKeyButton = document.createElement("button");
-    saveApiKeyButton.type = "button";
-    saveApiKeyButton.className = "save-api-key-button";
-    saveApiKeyButton.textContent = "Save API Key";
-    saveApiKeyButton.style.width = "100%";
-    saveApiKeyButton.addEventListener("click", () => {
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) {
-        customConfirm("Please enter an API key", function () {});
-        return;
-      }
-      console.log("Saving API Key:", apiKey);
-      chrome.runtime.sendMessage({ type: "SET_API_KEY", data: { apiKey: apiKey } }, (response) => {
-        if (response.success) {
-          customConfirm("API Key saved successfully!", function () {
-            apiKeyInput.value = "";
-            apiKeyInput.placeholder = "API Key saved";
-          });
-        } else {
-          customConfirm("Error saving API Key. Please try again.", function () {});
-        }
-      });
-    });
-
-    // Load and display API key status
-    chrome.runtime.sendMessage({ type: "GET_API_KEY", data: {} }, (response) => {
-      if (response.apiKeyExists) {
-        apiKeyInput.placeholder = "API Key is set";
-        apiKeyInput.value = "";
-      }
-      else {        
-        apiKeyInput.placeholder = "No Google Drive API Key saved";
-        apiKeyInput.value = "";
-      }
-    });
-
-    apiKeySection.appendChild(apiKeyLabel);
-    apiKeySection.appendChild(apiKeyInput);
-    apiKeySection.appendChild(saveApiKeyButton);
-    optionsDiv.appendChild(apiKeySection);
-    // ========================== End API Key Section ==========================
-
     //Create a sign in button to sign in to google account and sync data to google drive. 
     // This will use chrome.identity API to get access token and then use Google Drive API to create a file and store the data in it. 
     // When user clicks the button, check if they are already signed in by checking if we have a valid access token. 
@@ -228,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const signInButton = document.createElement("button");
     signInButton.type = "button";
     signInButton.className = "sign-in-button";
-    signInButton.textContent = "Sign in to Google and Sync Data to Drive";
+    signInButton.textContent = "Sync Data to Google Drive";
     //Check signed in status and disable button if already signed in and synced
     chrome.runtime.sendMessage({ type: "GET_SIGNED_IN_STATUS", data: {} }, (response) => {
       console.log("Signed in status response:", response);
@@ -242,12 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     signInButton.addEventListener("click", () => {
       console.log("Sign in button clicked");
       // Check if API key is set before proceeding
-      chrome.runtime.sendMessage({ type: "GET_API_KEY", data: {} }, (response) => {
-        if (!response.apiKeyExists) {
-          customConfirm("Please set your Google Drive API Key first", function () {});
-          return; // tested and works correctly to prevent further execution if API key is not set
-        }
-        chrome.runtime.sendMessage({ type: "SIGN_IN_TO_GOOGLE_DRIVE", data: {} }, (response) => {
+        chrome.runtime.sendMessage({ type: "SYNC_WITH_GOOGLE_DRIVE", data: {} }, (response) => {
           console.log("Sync to Google Drive response:", response);
           if (response.success) {
             customConfirm("Data synced to Google Drive successfully!", function (result) {
@@ -261,14 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           }
         });
-      });
     });
 
-
     optionsDiv.appendChild(signInButton);
-    
 
-    //create delete all data button
+    // ================== create delete all data button
     const deleteAllButton = document.createElement("button");
     deleteAllButton.type = "button";
     deleteAllButton.className = "delete-all-button";
