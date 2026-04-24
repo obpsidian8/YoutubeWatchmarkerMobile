@@ -95,7 +95,7 @@ function attachListeners(video) {
       timeLastPlayed: new Date().toISOString(),
     };
 
-    if (now - lastLocalSave > 3000) {
+    if (now - lastLocalSave > 3000) { // Save locally every 3 seconds
       lastLocalSave = now;
       console.log(`Instance ${latest_instance_id} Saving progress locally:`, progress);
       try {
@@ -111,7 +111,7 @@ function attachListeners(video) {
       }
     }
 
-    if (now - lastSyncSave > 120000) {
+    if (now - lastSyncSave > 120000) { // Save to sync every 2 minutes
       lastSyncSave = now;
       console.log(`Instance ${latest_instance_id} Saving progress to sync:`, progress);
       try {
@@ -126,6 +126,24 @@ function attachListeners(video) {
         console.error(`Instance ${latest_instance_id} Error sending SAVE_SYNC message:`, e);
       }
     }
+
+    // Create another save block for "SAVE_GOOGLE" type if you want to save to google drive as well
+    if (now - lastGoogleSave > 120000) { // Save to Google Drive every 2 minutes
+      lastGoogleSave = now;
+      console.log(`Instance ${latest_instance_id} Saving progress to Google Drive:`, progress);
+      try {
+        chrome.runtime.sendMessage({ type: "SAVE_GOOGLE", data: progress }, response =>{
+          if (chrome.runtime.lastError) {
+            console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+          } else {
+            console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+          }
+        });
+      } catch (e) {
+        console.error(`Instance ${latest_instance_id} Error sending SAVE_GOOGLE message:`, e);
+      }
+    }
+
   }
 
   //Forced save progress function for special events

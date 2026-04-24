@@ -55,6 +55,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.storage.sync.set({ videos: videos });
     });
   }
+  
   if (message.type === "SAVE_GOOGLE") {
     console.log("Saving to Google Drive:", message.data);
     // Will not sasve if videoId is undefined
