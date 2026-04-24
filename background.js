@@ -42,18 +42,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const videos = result.videos || {};
       videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.local.set({ videos: videos });
-      
-      // Try to upload to Google Drive if token is available
-      try {
-        const token = await getOrRefreshGoogleDriveAccessToken();
-        const fileId = await uploadToGoogleDrive(token, videos);
-        //When we save to Google Drive, we save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
-        chrome.storage.local.set({ googleDriveFileId: fileId }); 
-        console.log("Video uploaded to Google Drive (local save)");
-      } catch (error) {
-        console.error("Failed to upload to Google Drive:", error);
-        // Continue anyway, local save is already done
-      }
     });
   }
 
@@ -65,17 +53,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const videos = result.videos || {};
       videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
       chrome.storage.sync.set({ videos: videos });
-      
-      // Try to upload to Google Drive if token is available
+    });
+  }
+  if (message.type === "SAVE_GOOGLE") {
+    console.log("Saving to Google Drive:", message.data);
+    // Will not sasve if videoId is undefined
+    if (!videoId) return;
+    chrome.storage.local.get(["videos"], async (result) => {
+      const videos = result.videos || {};
+      videos[videoId] = { title, duration, currentTime, lastPlayed, timeLastPlayed };
       try {
         const token = await getOrRefreshGoogleDriveAccessToken();
         const fileId = await uploadToGoogleDrive(token, videos);
-        //When we save to Google Drive, we save the file ID to local storage so that we can update the same file next time instead of creating a new file each time
-        chrome.storage.local.set({ googleDriveFileId: fileId });
-        console.log("Video uploaded to Google Drive (sync save)");
       } catch (error) {
         console.error("Failed to upload to Google Drive:", error);
-        // Continue anyway, sync save is already done
       }
     });
   }
