@@ -193,6 +193,19 @@ function attachListeners(video) {
     } catch (e) {
       console.error(`Instance ${latest_instance_id} Error sending FORCE SAVE_LOCAL message:`, e);
     }
+
+    // Also force save to google drive 
+    try {
+      chrome.runtime.sendMessage({ type: "SAVE_GOOGLE", data: data }, response =>{
+        if (chrome.runtime.lastError) {
+          console.error(`Instance ${latest_instance_id} Message failed:`, chrome.runtime.lastError.message);
+        } else {
+          console.log(`Instance ${latest_instance_id} Message sent successfully:`, response);
+        }
+      });
+    } catch (e) {
+      console.error(`Instance ${latest_instance_id} Error sending FORCE SAVE_GOOGLE message:`, e);
+    }
   }
 
   function resumeVideo() {
