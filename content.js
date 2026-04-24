@@ -42,6 +42,7 @@ function attachListeners(video) {
 
   let lastLocalSave = 0;
   let lastSyncSave = 0;
+  let lastGoogleSave = 0;
   let timeUpdateEventCount = 0;
   let resumedOnce = false;
   let videoPlaying = false;
